@@ -4,5 +4,7 @@
 domain_entries:
   - domain_name: infra.ndkprd.com
     domain_scope: public
+    domain_policy: "DEFAULT_DNS_POLICY"
   - domain_name: devops.ndkprd.com
     domain_scope: public
+    domain_policy: "DEFAULT_DNS_POLICY"

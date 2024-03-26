@@ -21,7 +21,7 @@ An Ansible role to create DNS zone on FortiADC devices.
     - fortiadc-create-zone
 ```
 
-### Host Example
+### Hosts Example
 
 ```
 [fortiadc]
@@ -33,6 +33,18 @@ fad3 ansible_host=fad3.infra.ndkprd.com fad_apitoken=mysupersecrettoken3 fad_vdo
 fad_http_port=80
 fad_https_port=443
 
+```
+
+### Needed Variables Example
+
+```
+domain_entries:
+  - name: infra.ndkprd.com
+    scope: public
+    policy: "DEFAULT_DNS_POLICY"
+  - name: devops.ndkprd.com
+    sope: public
+    policy: "DEFAULT_DNS_POLICY"
 ```
 
 ## License
