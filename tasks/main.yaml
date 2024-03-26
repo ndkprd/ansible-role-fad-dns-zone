@@ -1,0 +1,34 @@
+---
+# ./tasks/main.yaml
+
+- name: Generate body file to be sent to FortiADC.
+  ansible.builtin.template:
+    src: "{{ ansible_galaxy_role_fortiadc-create-zone_path }}/templates/body.json.j2"
+    dest: "./files/fortiadc-create-zone.body.json"
+  delegate_to: localhost
+
+- name: Generate FortiADC global-load-balance host to automatically create fqdn_generate zone.
+  ansible.builtin.uri:
+    method: POST
+    url: "https://{{ ansible_host }}/global_load_balance_host?vdom={{ fad_vdom }}"
+    body_format: json
+    validate_cert: false
+    headers:
+      'Content-Type': 'application/json'
+      'APITOKEN': '{{ fad_apitoken }}'
+    body: |
+      "{
+        \"default-feedback-ip\": \"0.0.0.0\",
+        \"default-feedback-ip6\": \"\",
+        \"domain-name\": \"devops.asdp.id.\",
+        \"fortiview\": \"enable\",
+        \"host-name\": \"@\",
+        \"load-balance-method\": \"\",
+        \"mkey\": \"public_devops.asdp.id\",
+        \"persistence\": \"disable\",
+        \"respond-single-record\": \"enable\",
+        \"vs_pool_list\": \"\",
+        \"vs_pool_list_count\": \"\"
+      }"
+  delegate_to: localhost
+  when: "'fortiadc' in group_names"
