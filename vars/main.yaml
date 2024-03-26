@@ -1,0 +1,8 @@
+---
+# ./vars/main.yaml
+
+domain_entries:
+  - domain_name: infra.ndkprd.com
+    domain_scope: public
+  - domain_name: devops.ndkprd.com
+    domain_scope: public
