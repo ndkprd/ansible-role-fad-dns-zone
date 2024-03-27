@@ -1,8 +1,10 @@
 ---
 # ./tasks/main.yaml
 
-- include_tasks: add_glb_root_host.yaml
+- name: Include the add GLB root host task.
+  include_tasks: add_glb_root_host.yaml
   loop: "{{ fad_domains }}"
 
-- include_tasks: update_dns_policy_zone_list.yaml
+- name: Include the update DNS Policy zone list task.
+  include_tasks: update_dns_policy_zone_list.yaml
   loop: "{{ fad_domains }}"
