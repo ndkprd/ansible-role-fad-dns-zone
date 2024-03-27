@@ -15,4 +15,4 @@
 
 - name: Include the add DNS zone entries task.
   include_tasks: add_dns_zone_entries.yaml
-  loop: "{{ fad_domains }}"
+  loop: "{{ zone_aaa_records }}"
