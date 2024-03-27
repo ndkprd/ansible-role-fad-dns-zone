@@ -11,7 +11,8 @@
       'APITOKEN': '{{ fad_apitoken }}'
     body: |
       {
-        "hostname": "{{ item.hostname }}",
+        "host_name": "{{ item.hostname }}",
+        "domain_name": "@"
         "ip": "{{ item.ip }}",
         "mkey": "{{ item.mkey }}"
       }
