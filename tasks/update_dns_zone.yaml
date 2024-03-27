@@ -12,7 +12,7 @@
     body: |
       {
         "ttl": "{{ item.ttl }}"
-        "negative_ttl": "{{ item.negative.ttl }}"
+        "negative_ttl": "{{ item.negative_ttl }}"
         "primary_server_ip": "{{ item.primary_ns_ip }}"
         "primary_server_name": "{{ item.primary_ns_hostname }}"
         "responsible_mail": "{{ item.responsible_mail }}"
