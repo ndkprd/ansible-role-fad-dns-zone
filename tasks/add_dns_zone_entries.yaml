@@ -1,7 +1,7 @@
 - name: Add some basic DNS zone entries.
   ansible.builtin.uri:
     method: POST
-    url: "https://{{ ansible_host }}/api/global_dns_server_zone_child_a_aaaa_record?vdom={{ fad_vdom }}&pkey=fqdn_generate_{{ item.name }}"
+    url: "https://{{ ansible_host }}/api/global_dns_server_zone_child_a_aaaa_record?vdom={{ fad_vdom }}&pkey=fqdn_generate_{{ item.0 }}"
     body_format: json
     validate_certs: false
     return_content: yes
@@ -11,14 +11,14 @@
       'APITOKEN': '{{ fad_apitoken }}'
     body: |
       {
-        "hostname": "{{ hostname }}",
-        "ip": "{{ ip }}",
-        "mkey": "{{ mkey }}",
-        "source_type": "{{ source_type }}",
-        "ttl": "{{ ttl }}"
+        "hostname": "{{ item.1.hostname }}",
+        "ip": "{{ item.1.ip }}",
+        "mkey": "{{ item.1.mkey }}",
+        "source_type": "{{ item.1.source_type }}",
+        "ttl": "{{ item.1.ttl }}"
       }
   register: glb_host_data
   delegate_to: localhost
-  loop: "{{ fad_domains.aaa_entries }}"
+  loop: "{{ zone_aaa_records | dict2items }}"
   when: "'fortiadc' in group_names"
   changed_when: "glb_host_data.json.payload == 0"
