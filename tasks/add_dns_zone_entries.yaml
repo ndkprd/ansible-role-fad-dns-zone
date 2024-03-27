@@ -13,9 +13,7 @@
       {
         "hostname": "{{ item.hostname }}",
         "ip": "{{ item.ip }}",
-        "mkey": "{{ item.mkey }}",
-        "source_type": "{{ item.source_type }}",
-        "ttl": "{{ item.ttl }}"
+        "mkey": "{{ item.mkey }}"
       }
   register: glb_host_data
   delegate_to: localhost
