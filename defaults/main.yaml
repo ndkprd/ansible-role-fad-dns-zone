@@ -40,10 +40,10 @@ zone_ns_records:
   # devops.asdp.id
   - hostname: ns
     domain_name: devops.ndkprd.com
-    ip: 36.92.152.200
+    ip: 10.10.10.10
     mkey: 1001
-  #devsecops.asdp.id:
+  # devsecops.asdp.id:
   - hostname: ns
     domain_name: infra.ndkprd.com
-    ip: 36.92.152.200
+    ip: 10.10.10.10
     mkey: 1001
