@@ -1,4 +1,4 @@
-- name: Generate FortiADC global-load-balance root host to automatically create fqdn_generate zone.
+- name: Generate FortiADC global-load-balance root host to automatically create fqdn_generate zone for {{ item.name }}.
   ansible.builtin.uri:
     method: POST
     url: "https://{{ ansible_host }}/api/global_load_balance_host?vdom={{ fad_vdom }}"
@@ -27,4 +27,5 @@
   delegate_to: localhost
   when: "'fortiadc' in group_names"
   changed_when: "glb_host_data.json.payload == 0"
+  failed_when: "glb_host_data.json.payload != -15"
   

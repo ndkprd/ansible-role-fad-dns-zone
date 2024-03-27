@@ -21,3 +21,29 @@ fad_domains:
 # GLOBAL-DNS-SERVER POLICY
 fad_dns_policy:
   name: DEFAULT_DNS_POLICY # name of the DNS policy used by FAD
+
+#GLOBAL-DNS-SERVER A RECORDS
+zone_aaa_records:
+  # devops.ndkprd.com
+  - hostname: ns
+    domain_name: devops.ndkprd.com
+    ip: 10.10.10.1
+    mkey: 1001 # high number of mkey to make sure it's not conflicted
+  # infra.ndkprd.com
+  - hostname: ns
+    domain_name: infra.ndkprd.com
+    ip: 10.10.10.1
+    mkey: 1001
+
+#GLOBAL-DNS-SERVER NS RECORD
+zone_ns_records:
+  # devops.asdp.id
+  - hostname: ns
+    domain_name: devops.ndkprd.com
+    ip: 36.92.152.200
+    mkey: 1001
+  #devsecops.asdp.id:
+  - hostname: ns
+    domain_name: infra.ndkprd.com
+    ip: 36.92.152.200
+    mkey: 1001

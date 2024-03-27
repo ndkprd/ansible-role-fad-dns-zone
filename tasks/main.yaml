@@ -12,3 +12,11 @@
 - name: Include the update DNS Zone configuration task.
   include_tasks: update_dns_zone.yaml
   loop: "{{ fad_domains }}"
+
+- name: Include the add A record DNS entry task.
+  include_tasks: add_basic_a_record.yaml
+  loop: "{{ zone_aaa_records }}"
+
+- name: Include the add NS record DNS entry task.
+  include_tasks: add_basic_ns_record.yaml
+  loop: "{{ zone_ns_records }}"
