@@ -1,4 +1,4 @@
-- name: Add some basic DNS zone entries.
+- name: Add an A Record DNS for {{ item.hostname }}.{{ item.domain_name }} in {{ item.domain_name }} zone.
   ansible.builtin.uri:
     method: POST
     url: "https://{{ ansible_host }}/api/global_dns_server_zone_child_a_aaaa_record?vdom={{ fad_vdom }}&pkey=fqdn_generate_{{ item.domain_name }}."
