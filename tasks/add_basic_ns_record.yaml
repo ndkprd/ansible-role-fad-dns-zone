@@ -12,7 +12,7 @@
     body: |
       {
         "host_name": "{{ item.hostname }}",
-        "domain_name": "@"
+        "domain_name": "@",
         "ip": "{{ item.ip }}",
         "mkey": "{{ item.mkey }}"
       }
