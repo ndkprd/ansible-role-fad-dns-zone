@@ -1,10 +1,13 @@
 ---
 # ./vars/main.yaml
 
-domain_entries:
-  - domain_name: infra.ndkprd.com
-    domain_scope: public
-    domain_policy: "DEFAULT_DNS_POLICY"
+# GLOBAL-LOAD-BALANCE HOST
+fad_domains:
+  - domain_name: infra.ndkprd.com # base domain without dot at the end
+    domain_scope: public # scope for naming only, I personally use "public" and "local"
   - domain_name: devops.ndkprd.com
     domain_scope: public
-    domain_policy: "DEFAULT_DNS_POLICY"
+
+# GLOBAL-DNS-SERVER POLICY
+fad_dns_policy:
+  name: DEFAULT_DNS_POLICY # name of the DNS policy used by FAD

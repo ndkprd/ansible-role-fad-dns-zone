@@ -30,20 +30,12 @@
   delegate_to: localhost
   when: "'fortiadc' in group_names"
   changed_when: "glb_host_data.json.payload == 0"
-  loop: "{{ domain_entries }}"
+  loop: "{{ fad_domains }}"
 
-#- name: Print out the whole response.
-  #debug:
-    #var: data.json
-
-#- name: Print out the value of the payload response.
-  #debug:
-    #var: data.json.payload.zone_list
-
-- name: Get the value of DEFAULT_DNS_POLICY zone list.
+- name: Get the existing value of the FAD DNS Policy zone list.
   ansible.builtin.uri:
     method: GET
-    url: "https://{{ ansible_host }}/api/global_dns_server_policy?vdom={{ fad_vdom }}&mkey=DEFAULT_DNS_POLICY"
+    url: "https://{{ ansible_host }}/api/global_dns_server_policy?vdom={{ fad_vdom }}&mkey={{ fad_dns_policy.name }}"
     body_format: json
     validate_certs: false
     return_content: yes
@@ -55,28 +47,28 @@
   delegate_to: localhost
   when: "'fortiadc' in group_names"
 
-- name: Print out the whole response.
-  debug:
-    var: dns_policy_data.json
-
-- name: Get the zone list.
-  debug:
+- name: Print out the existing value of the FAD DNS Policy zone list.
+  ansible.builtin.debug:
     var: dns_policy_data.json.payload.zone_list
+  tags:
+    - debug
 
 - name: Set the new zone list value.
   ansible.builtin.set_fact:
     new_zone_list: "{{ dns_policy_data.json.payload.zone_list }}fqdn_generate_{{ item.name }}. "
   when: "'fortiadc' in group_names"
-  loop: "{{ domain_entries }}"
+  loop: "{{ fad_domains }}"
 
-- name: Print out the new zone list.
-  debug:
+- name: Print out the new zone list created by Ansible.
+  ansible.builtin.debug:
     var: new_zone_list
+  tags:
+    - debug
 
-- name: Move the generated fqdn_generate zone to their policy.
+- name: Update the FortiADC DNS policy zone list.
   ansible.builtin.uri:
     method: PUT
-    url: "https://{{ ansible_host }}/api/global_dns_server_policy?vdom={{ fad_vdom }}&mkey=DEFAULT_DNS_POLICY"
+    url: "https://{{ ansible_host }}/api/global_dns_server_policy?vdom={{ fad_vdom }}&mkey={{ fad_dns_policy.name }}"
     body_format: json
     validate_certs: false
     return_content: yes
@@ -91,13 +83,12 @@
   delegate_to: localhost
   register: dns_policy_move_result
   when: "'fortiadc' in group_names"
-  changed_when: "dns_policy_move_result.json.payload == 0"
+  #changed_when: "dns_policy_move_result.json.payload == 0"
 
-
-- name: Print out the new zone list value from FortiADC.
+- name: Get the new zone list value from FortiADC.
   ansible.builtin.uri:
     method: GET
-    url: "https://{{ ansible_host }}/api/global_dns_server_policy?vdom={{ fad_vdom }}&mkey=DEFAULT_DNS_POLICY"
+    url: "https://{{ ansible_host }}/api/global_dns_server_policy?vdom={{ fad_vdom }}&mkey={{ fad_dns_policy.name }}"
     body_format: json
     validate_certs: false
     return_content: yes
@@ -108,7 +99,11 @@
   register: dns_policy_data_new
   delegate_to: localhost
   when: "'fortiadc' in group_names"
+  tags:
+    - debug
 
-- name: Get the zone list.
-  debug:
+- name: Print out the new zone list in the FortiADC DNS Policy.
+  ansible.builtin.debug:
     var: dns_policy_data_new.json.payload.zone_list
+  tags:
+    - debug
