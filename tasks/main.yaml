@@ -10,5 +10,5 @@
   loop: "{{ fad_domains }}"
 
 - name: Include the update DNS Zone configuration task.
-  include_task: update_dns_zone.yaml
+  include_tasks: update_dns_zone.yaml
   loop: "{{ fad_domains }}"
