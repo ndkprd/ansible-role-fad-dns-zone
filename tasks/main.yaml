@@ -8,3 +8,7 @@
 - name: Include the update DNS Policy zone list task.
   include_tasks: update_dns_policy_zone_list.yaml
   loop: "{{ fad_domains }}"
+
+- name: Include the update DNS Zone configuration task.
+  include_task: update_dns_zone.yaml
+  loop: "{{ fad_domains }}"

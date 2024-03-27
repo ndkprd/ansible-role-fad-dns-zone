@@ -1,0 +1,22 @@
+- name: Update the FortiADC DNS policy zone list.
+  ansible.builtin.uri:
+    method: PUT
+    url: "https://{{ ansible_host }}/api/global_dns_server_zone?vdom={{ fad_vdom }}&mkey={{ fad_dns_policy.name }}"
+    body_format: json
+    validate_certs: false
+    return_content: yes
+    status_code: 200
+    headers:
+      'Content-Type': 'application/json'
+      'APITOKEN': '{{ fad_apitoken }}'
+    body: |
+      {
+        "ttl": "{{ item.ttl }}"
+        "negative_ttl": "{{ item.negative.ttl }}"
+        "primary_server_ip": "{{ item.primary_ns_ip }}"
+        "primary_server_name": "{{ item.primary_ns_hostname }}"
+        "responsible_mail": "{{ item.responsible_mail }}"
+      }
+  delegate_to: localhost
+  register: dns_policy_move_result
+  when: "'fortiadc' in group_names"
