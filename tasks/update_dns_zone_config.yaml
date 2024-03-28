@@ -22,4 +22,6 @@
 
 - name: Debug out the payload value for {{ item.name }}.
   ansible.builtin.debug:
-    var: dns_zone_config_update_result.json
+    var: dns_zone_config_update_result
+  tags:
+    - debug
