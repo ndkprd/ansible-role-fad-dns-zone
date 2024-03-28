@@ -33,7 +33,7 @@ zone_aaa_records:
   - hostname: ns
     domain_name: infra.ndkprd.com
     ip: 10.10.10.1
-    mkey: 1001
+    mkey: 1002
 
 #GLOBAL-DNS-SERVER NS RECORD
 zone_ns_records:
@@ -46,4 +46,4 @@ zone_ns_records:
   - hostname: ns
     domain_name: infra.ndkprd.com
     ip: 10.10.10.10
-    mkey: 1001
+    mkey: 1002
