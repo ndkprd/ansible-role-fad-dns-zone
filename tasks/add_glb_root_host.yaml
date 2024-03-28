@@ -26,5 +26,5 @@
   register: glb_host_data
   delegate_to: localhost
   changed_when: "glb_host_data.json.payload == 0"
-  failed_when: "glb_host_data.json.payload != -15"
+  failed_when: "glb_host_data.json.payload != -15 or glb_host_data.json.payload != 0"
   
