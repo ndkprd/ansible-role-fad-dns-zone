@@ -35,6 +35,9 @@
     validate_certs: false
     return_content: yes
     status_code: 200
+    headers:
+      'Content-Type': 'application/json'
+      'APITOKEN': '{{ fad_apitoken }}'
   delegate_to: localhost
   register: dns_zone_config_value
   tags:
