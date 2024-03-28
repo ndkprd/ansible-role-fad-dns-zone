@@ -26,3 +26,22 @@
     var: dns_zone_config_update_result
   tags:
     - debug
+
+- name: Get the current FortiADC DNS zone configuration for {{ item.name }}.
+  ansible.builtin.uri:
+    method: GET
+    url: "https://{{ ansible_host }}/api/global_dns_server_zone?vdom={{ fad_vdom }}&mkey=fqdn_generate_{{ item.name }}."
+    body_format: json
+    validate_certs: false
+    return_content: yes
+    status_code: 200
+  delegate_to: localhost
+  register: dns_zone_config_value
+  tags:
+    - debug
+
+- name: Debug out the value of current FortiADC zone config for {{ item.name }}.
+  ansible.builtin.debug:
+    var: dns_zone_config_value.json
+  tags:
+    - debug
