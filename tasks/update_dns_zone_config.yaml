@@ -1,4 +1,4 @@
-- name: Update the FortiADC DNS policy zone list for {{ item.name }}
+- name: Update the FortiADC DNS policy zone list for {{ item.name }}.
   ansible.builtin.uri:
     method: PUT
     url: "https://{{ ansible_host }}/api/global_dns_server_zone?vdom={{ fad_vdom }}&mkey={{ fad_dns_policy.name }}"
@@ -19,4 +19,3 @@
       }
   delegate_to: localhost
   register: dns_policy_move_result
-  when: "'fortiadc' in group_names"

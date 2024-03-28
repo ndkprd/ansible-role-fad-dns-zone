@@ -18,6 +18,5 @@
       }
   register: glb_host_data
   delegate_to: localhost
-  when: "'fortiadc' in group_names"
   changed_when: "glb_host_data.json.payload == 0"
   failed_when: "glb_host_data.json.payload != -15"

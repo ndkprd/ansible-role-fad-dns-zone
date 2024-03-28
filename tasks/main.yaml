@@ -10,7 +10,7 @@
   loop: "{{ fad_domains }}"
 
 - name: Include the update DNS Zone configuration task.
-  include_tasks: update_dns_zone.yaml
+  include_tasks: update_dns_zone_config.yaml
   loop: "{{ fad_domains }}"
 
 - name: Include the add A record DNS entry task.

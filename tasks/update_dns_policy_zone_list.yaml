@@ -11,11 +11,10 @@
       'APITOKEN': '{{ fad_apitoken }}'
   register: dns_policy_data
   delegate_to: localhost
-  when: "'fortiadc' in group_names"
 
 - name: Print out the existing value of the FAD DNS Policy zone list.
   ansible.builtin.debug:
-    var: dns_policy_data.json.payload.zone_list
+    msg: "The current value of the FAD DNS Policy zone list is {{ dns_policy_data.json.payload.zone_list }}."
   tags:
     - debug
 
@@ -23,11 +22,10 @@
   ansible.builtin.set_fact:
     new_zone_list: "{{ dns_policy_data.json.payload.zone_list }}fqdn_generate_{{ item.name }}. "
   when: "'fortiadc' in group_names"
-  #loop: "{{ fad_domains }}"
 
 - name: Print out the new zone list created by Ansible.
   ansible.builtin.debug:
-    var: new_zone_list
+    msg: "The new zone list that will be updated to FAD DNS Policy is {{ new_zone_list }}."
   tags:
     - debug
 
@@ -49,7 +47,7 @@
   delegate_to: localhost
   register: dns_policy_move_result
   when: "'fortiadc' in group_names"
-  #changed_when: "dns_policy_move_result.json.payload == 0"
+  failed_when: "dns_policy_move_result.json.payload != 0"
 
 - name: Get the new zone list value from FortiADC.
   ansible.builtin.uri:
@@ -70,6 +68,6 @@
 
 - name: Print out the new zone list in the FortiADC DNS Policy.
   ansible.builtin.debug:
-    var: dns_policy_data_new.json.payload.zone_list
+    msg: "The new zone-list that's in FAD DNS Policy is {{ dns_policy_data_new.json.payload.zone_list }}."
   tags:
     - debug
