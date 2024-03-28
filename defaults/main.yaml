@@ -37,12 +37,12 @@ zone_aaa_records:
 
 #GLOBAL-DNS-SERVER NS RECORD
 zone_ns_records:
-  # devops.asdp.id
+  # devops.ndkprd.com:
   - hostname: ns
     domain_name: devops.ndkprd.com
     ip: 10.10.10.10
     mkey: 1001
-  # devsecops.asdp.id:
+  # infra.ndkprd.com:
   - hostname: ns
     domain_name: infra.ndkprd.com
     ip: 10.10.10.10
