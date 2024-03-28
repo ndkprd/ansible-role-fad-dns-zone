@@ -19,6 +19,7 @@
       }
   delegate_to: localhost
   register: dns_zone_config_update_result
+  failed_when: "dns_zone_config_update_result != 0"
 
 - name: Debug out the payload value for {{ item.name }}.
   ansible.builtin.debug:
