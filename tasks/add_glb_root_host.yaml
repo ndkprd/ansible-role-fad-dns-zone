@@ -30,4 +30,4 @@
   
 - name: Debug out the value.
   debug:
-    var: hostvars
+    var: glb_host_data
