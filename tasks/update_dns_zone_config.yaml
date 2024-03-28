@@ -1,7 +1,7 @@
-- name: Update the FortiADC DNS policy zone list for {{ item.name }}.
+- name: Update the FortiADC DNS zone configuration for {{ item.name }}.
   ansible.builtin.uri:
     method: PUT
-    url: "https://{{ ansible_host }}/api/global_dns_server_zone?vdom={{ fad_vdom }}&mkey={{ fad_dns_policy.name }}"
+    url: "https://{{ ansible_host }}/api/global_dns_server_zone?vdom={{ fad_vdom }}&mkey=fqdn_generate_{{ fad_dns_policy.name }}."
     body_format: json
     validate_certs: false
     return_content: yes
@@ -18,4 +18,8 @@
         "responsible_mail": "{{ item.responsible_mail }}"
       }
   delegate_to: localhost
-  register: dns_policy_move_result
+  register: dns_zone_config_update_result
+
+- name: Debug out the payload value for {{ item.name }}.
+  ansible.builtin.debug:
+    var: dns_zone_config_update_result.json
