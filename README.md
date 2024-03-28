@@ -13,14 +13,14 @@ An Ansible role to create DNS zone on FortiADC devices.
 # ./playbook.yaml
 
 - name: Create new FortiADC zone.
-  hosts: all
+  hosts: fortiadc
   become: true
   gather_facts: no
   vars_files:
     - vars.yaml
 
   roles:
-    - fortiadc-create-zone
+    - role: fortiadc-create-zone
 ```
 
 ### Hosts Example
