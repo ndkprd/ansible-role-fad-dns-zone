@@ -66,7 +66,7 @@
     fad_dns_zone_existing_data.json.payload.primary_server_ip != dns_zone.primary_ns_ipv4 or
     fad_dns_zone_existing_data.json.payload.primary_server_ip6 != dns_zone.primary_ns_ipv6 or
     fad_dns_zone_existing_data.json.payload.primary_server_name != dns_zone.primary_ns_name or
-    fad_dns_zone_existing_data.json.payload.responible_mail != dns_zone.responsible.mail or 
+    fad_dns_zone_existing_data.json.payload.responible_mail != dns_zone.responsible_mail or 
     fad_dns_zone_existing_data.json.payload.allow_transfer != dns_zone.allow_transfer)
   tags:
     - fad_dns_zones
