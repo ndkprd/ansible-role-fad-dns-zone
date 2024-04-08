@@ -89,7 +89,7 @@
 
 - name: Print out the DNS Zone data for zone {{ fad_dns_policy_zone_name }}
   ansible.builtin.debug:
-  var:  fad_dns_zone_root_glb_new_data.json.payload
+    var:  fad_dns_zone_root_glb_new_data.json.payload
   tags:
-  - fad_dns_zones
-  - debug
+    - fad_dns_zones
+    - debug
