@@ -1,23 +1,18 @@
 ---
+dependencies:
+  - ndkprd.fortiadc-dns-policy
+
 galaxy_info:
   author: ndkprd
-  role_name: fortiadc-create-zone
-  description: An Ansible role to create zones on FortiADC
-
+  role_name: fortiadc-dns-policy
+  description: An Ansible role to mange/setup Fortinet's FortiADC Global DNS Policy configuration using REST API.
   license: MIT
-
   min_ansible_version: '2.12'
-
   platforms:
-    - name: "RHEL/CentOS"
+    - name: Fedora
       versions:
-        - '7'
-        - '8'
-        - '9'
-
+        - 'all'
   galaxy_tags:
     - fortiadc
     - fortinet
     - dns
-
-dependencies: []

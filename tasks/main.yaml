@@ -1,22 +1,19 @@
 ---
-# ./tasks/main.yaml
 
-- name: Include the add GLB root host task.
-  include_tasks: add_glb_root_host.yaml
-  loop: "{{ fad_domains }}"
+- name: Trying to create fqdn_generate zone by creating domain root record.
+  include_tasks: add_glb_host_root.yaml
+  loop: "{{ fad_dns_zones }}"
+  loop_control:
+    loop_var: dns_zone
 
-- name: Include the update DNS Policy zone list task.
-  include_tasks: update_dns_policy_zone_list.yaml
-  loop: "{{ fad_domains }}"
+- name: Update the zone configuration task.
+  include_tasks: update_dns_zonesyaml
+  loop: "{{ fad_dns_zones }}"
 
-- name: Include the update DNS Zone configuration task.
-  include_tasks: update_dns_zone_config.yaml
-  loop: "{{ fad_domains }}"
+# - name: Include the add A record DNS entry task.
+#   include_tasks: add_basic_a_record.yaml
+#   loop: "{{ zone_aaa_records }}"
 
-- name: Include the add A record DNS entry task.
-  include_tasks: add_basic_a_record.yaml
-  loop: "{{ zone_aaa_records }}"
-
-- name: Include the add NS record DNS entry task.
-  include_tasks: add_basic_ns_record.yaml
-  loop: "{{ zone_ns_records }}"
+# - name: Include the add NS record DNS entry task.
+#   include_tasks: add_basic_ns_record.yaml
+#   loop: "{{ zone_ns_records }}"

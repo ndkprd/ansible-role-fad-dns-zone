@@ -1,0 +1,77 @@
+---
+
+- name: Set endpoints and variables for {{ dns_zone.name }}
+  ansible.builtin.set_fact:
+    fad_api_endpoint_glb_host: "https://{{ ansible_host }}/api/global_load_balance_host?vdom={{ fad_vdom }}&mkey={{ dns_zone.name }}"
+    fad_api_endpoint_dns_zone: "https://{{ ansible_host }}/api/global_dns_server_zone?vdom={{ fad_vdom }}&mkey=fqdn_generate_{{ dns_zone.name }}."
+    fad_dns_zone_name: "fqdn_generate_{{dns_zone.name }}"
+  tags:
+    - fad_dns_zones
+
+- name: Check if the root GLB Host is exist for zone {{ fad_dns_zone_name }}
+  ansible.builtin.uri:
+    method: GET
+    url: "{{ fad_api_endpoint_glb_host }}"
+    body_format: "{{ fad_api_uri_params.body_format }}"
+    validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+    return_content: "{{ fad_api_uri_params.return_content }}"
+    status_code: "{{ fad_api_uri_params.status_code }}"
+    headers: "{{ fad_api_header }}"
+  register: fad_dns_zone_root_glb_existing_data
+  delegate_to: localhost
+  tags:
+    - fad_dns_zones
+
+- name: Print out the existing root GLB Host value for zone {{ fad_dns_zone_name }}
+ansible.builtin.debug:
+  var:  fad_dns_zone_root_glb_existing_data.json.payload
+when: fad_dns_zone_root_glb_existing_data.json.payload is defined
+tags:
+  - fad_dns_zones
+  - debug
+
+- name: Create new root GLB Host if entry doesn't exists yet for zone {{ fad_dns_zone_name }}
+  ansible.builtin.uri:
+    method: POST
+    url: "{{ fad_api_endpoint_glb_host }}"
+    body_format: "{{ fad_api_uri_params.body_format }}"
+    validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+    return_content: "{{ fad_api_uri_params.return_content }}"
+    status_code: "{{ fad_api_uri_params.status_code }}"
+    headers: "{{ fad_api_header }}"
+    body: |
+      {
+        "mkey": "{{ dns_zone.domain }}",
+        "host-name": "@",
+        "domain-name": "{{ dns_zone.name }}"
+      }
+  register: fad_dns_zone_root_glb_post_result
+  delegate_to: localhost
+  when: fad_dns_zone_root_glb_existing_data.json.payload.mkey is undefined
+  changed_when: fad_dns_zone_root_glb_post_result == 0
+  failed_when: (fad_dns_zone_root_glb_post_result != 0) or fad_dns_zone_root_glb_post_result != -15)
+  tags:
+    - fad_dns_zones
+
+- name: Check if the root GLB Host data has changed for zone {{ fad_dns_zone_name }}
+  ansible.builtin.uri:
+    method: GET
+    url: "{{ fad_api_endpoint_glb_host }}"
+    body_format: "{{ fad_api_uri_params.body_format }}"
+    validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+    return_content: "{{ fad_api_uri_params.return_content }}"
+    status_code: "{{ fad_api_uri_params.status_code }}"
+    headers: "{{ fad_api_header }}"
+  register: fad_dns_zone_root_glb_new_data
+  delegate_to: localhost
+  changed_when: fad_dns_zone_root_glb_new_data.json.payload != fad_dns_zone_root_glb_existing_data.json.payload
+  tags:
+    - fad_dns_zones
+    - debug
+
+- name: Print out the new root GLB Host value for zone {{ fad_dns_zone_name }}
+ansible.builtin.debug:
+  var:  fad_dns_zone_root_glb_new_data.json.payload
+tags:
+  - fad_dns_zones
+  - debug
