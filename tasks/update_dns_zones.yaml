@@ -61,7 +61,7 @@
       delegate_to: localhost
   when: >
     (fad_dns_zone_existing_data.json.payload.mkey is defined) and
-    (fad_dns_zone_existing_data.json.payload.ttl != or dns_zone.ttl or
+    (fad_dns_zone_existing_data.json.payload.ttl != dns_zone.ttl or
     fad_dns_zone_existing_data.json.payload.negative_ttl != dns_zone.negative_ttl or
     fad_dns_zone_existing_data.json.payload.primary_server_ip != dns_zone.primary_ns_ipv4 or
     fad_dns_zone_existing_data.json.payload.primary_server_ip6 != dns_zone.primary_ns_ipv6 or
