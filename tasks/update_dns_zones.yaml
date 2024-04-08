@@ -42,7 +42,7 @@
             "responible_mail": "{{ dns_zone.responsible_mail }}",
             "allow_transfer": "{{ dns_zone.allow_transfer }}"
           }
-    - name: Print out the value of request body json for zone {{ fad_dns_policy_zone_name }}
+    - name: Print out the value of request body json for zone {{ fad_dns_zone_name }}
       ansible.builtin.debug:
         var: request_body
       tags:
@@ -57,7 +57,9 @@
         status_code: "{{ fad_api_uri_params.status_code }}"
         headers: "{{ fad_api_header }}"
         body: "{{ request_body }}"
-      register: fad_dns_zone_existing_data
+      register: fad_dns_zone_put_result
+      changed_when: fad_dns_zone_put_result.json.payload == 0
+      failed_when: fad_dns_zone_put_result.json 
       delegate_to: localhost
   when: >
     (fad_dns_zone_existing_data.json.payload.mkey is defined) and
