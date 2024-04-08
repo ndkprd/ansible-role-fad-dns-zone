@@ -32,6 +32,7 @@ ansible-galaxy install ndkprd.fortiadc-dns-policy
 
 ```
 ansible-galaxy install -r requirements.yaml
+```
 
 ### Playbook Example
 
