@@ -49,7 +49,7 @@
   delegate_to: localhost
   when: fad_dns_zone_root_glb_existing_data.json.payload.mkey is undefined
   changed_when: fad_dns_zone_root_glb_post_result.json.payload == 0
-  failed_when: (fad_dns_zone_root_glb_post_result.json.payload != 0) and fad_dns_zone_root_glb_post_result.json.payload != -15)
+  failed_when: (fad_dns_zone_root_glb_post_result.json.payload != 0) and (fad_dns_zone_root_glb_post_result.json.payload != -15)
   tags:
     - fad_dns_zones
 
