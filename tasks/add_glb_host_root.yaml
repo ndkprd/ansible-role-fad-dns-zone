@@ -71,7 +71,7 @@
 
 - name: Print out the new root GLB Host value for zone {{ fad_dns_zone_name }}
   ansible.builtin.debug:
-  var:  fad_dns_zone_root_glb_new_data.json.payload
+    var:  fad_dns_zone_root_glb_new_data.json.payload
   tags:
   - fad_dns_zones
   - debug
