@@ -7,7 +7,7 @@
     loop_var: dns_zone
 
 - name: Update the zone configuration task.
-  include_tasks: update_dns_zonesyaml
+  include_tasks: update_dns_zones.yaml
   loop: "{{ fad_dns_zones }}"
 
 # - name: Include the add A record DNS entry task.
