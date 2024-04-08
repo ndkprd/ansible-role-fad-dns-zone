@@ -59,7 +59,7 @@
         body: "{{ request_body }}"
       register: fad_dns_zone_put_result
       changed_when: fad_dns_zone_put_result.json.payload == 0
-      failed_when: fad_dns_zone_put_result.json 
+      failed_when: (fad_dns_zone_put_result.json.payload != 0) and (fad_dnz_zone_put_result.json.payload != -15)
       delegate_to: localhost
   when: >
     (fad_dns_zone_existing_data.json.payload.mkey is defined) and
