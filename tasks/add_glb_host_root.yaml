@@ -24,9 +24,9 @@
 
 - name: Print out the existing root GLB Host value for zone {{ fad_dns_zone_name }}
   ansible.builtin.debug:
-  var:  fad_dns_zone_root_glb_existing_data.json.payload
-when: fad_dns_zone_root_glb_existing_data.json.payload is defined
-tags:
+    var:  fad_dns_zone_root_glb_existing_data.json.payload
+  when: fad_dns_zone_root_glb_existing_data.json.payload is defined
+  tags:
   - fad_dns_zones
   - debug
 
