@@ -22,11 +22,11 @@
     - fad_dns_zones
 
 - name: Print out the DNS Zone existing data for zone {{ fad_dns_zone_name }}
-ansible.builtin.debug:
-  var:  fad_dns_zone_existing_data.json.payload
-tags:
-  - fad_dns_zones
-  - debug
+  ansible.builtin.debug:
+    var:  fad_dns_zone_existing_data.json.payload
+  tags:
+    - fad_dns_zones
+    - debug
 
 - name: Write DNS Zone request body and update.
   block:
