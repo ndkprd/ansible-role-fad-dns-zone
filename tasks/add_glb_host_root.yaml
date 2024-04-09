@@ -40,7 +40,7 @@
     headers: "{{ fad_api_header }}"
     body: |
       {
-        "mkey": "fqdn_generate_{{ dns_zone.name }}.",
+        "mkey": "{{ dns_zone.name }}",
         "host-name": "@",
         "domain-name": "{{ dns_zone.name }}."
       }
