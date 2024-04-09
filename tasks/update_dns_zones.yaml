@@ -95,3 +95,8 @@
   tags:
     - fad_dns_zones
     - debug
+
+- name: Update DNS Policy so zone_list include this zone {{ fad_dns_policy_zone_name }}
+  ansible.builtin.include_tasks: update_dns_policy_zone_list.yaml
+  tags:
+    - fad_dns_zones
