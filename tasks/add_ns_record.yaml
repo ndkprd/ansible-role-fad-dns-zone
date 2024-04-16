@@ -40,13 +40,13 @@
     headers: "{{ fad_api_header }}"
     body: |
       {
-        "mkey": "{{ ns_record.id }}",
+        "mkey": "{{ ns_record.id | string }}",
         "host_name": "{{ ns_record.hostname }}",
         "domain_name": "{{ ns_record.domain_name }}",
-        "ip": "{{ ns_record.ipv4 | default('0.0.0.0') }}",
-        "ip6": "{{ ns_record.ipv6| default('::') }}",
-        "ttl": "{{ ns_record.ttl | default('-1') }}",
-        "type": "{{ ns_record.ip_type | default('ipv4') }}"
+        "ip": "{{ ns_record.ipv4 | default('0.0.0.0') | string }}",
+        "ip6": "{{ ns_record.ipv6| default('::') | string }}",
+        "ttl": "{{ ns_record.ttl | default('-1') | string }}",
+        "type": "{{ ns_record.ip_type | default('ipv4') | string }}"
       }
   register: fad_dns_zone_ns_record_post_result
   delegate_to: localhost
@@ -67,13 +67,13 @@
     headers: "{{ fad_api_header }}"
     body: |
       {
-        "mkey": "{{ ns_record.id }}",
+        "mkey": "{{ ns_record.id | string }}",
         "host_name": "{{ ns_record.hostname }}",
         "domain_name": "{{ ns_record.domain_name }}",
-        "ip": "{{ ns_record.ipv4 | default('0.0.0.0') }}",
-        "ip6": "{{ ns_record.ipv6| default('::') }}",
-        "ttl": "{{ ns_record.ttl | default('-1') }}",
-        "type": "{{ ns_record.ip_type | default('ipv4') }}"
+        "ip": "{{ ns_record.ipv4 | default('0.0.0.0') | string }}",
+        "ip6": "{{ ns_record.ipv6| default('::') | string }}",
+        "ttl": "{{ ns_record.ttl | default('-1') | string }}",
+        "type": "{{ ns_record.ip_type | default('ipv4') | string }}"
       }
   register: fad_dns_zone_ns_record_post_result
   delegate_to: localhost

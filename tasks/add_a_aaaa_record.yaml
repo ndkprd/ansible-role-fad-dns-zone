@@ -66,11 +66,11 @@
     headers: "{{ fad_api_header }}"
     body: |
       {
-        "mkey": "{{ a_aaaa_record.id }}",
+        "mkey": "{{ a_aaaa_record.id | string }}",
         "hostname": "{{ a_aaaa_record.hostname }}",
-        "ip": "{{ a_aaaa_record.ipv4 | default('0.0.0.0') }}",
-        "ip6": "{{ a_aaaa_record.ipv6 | default('::') }}",
-        "ttl": "{{ a_aaaa_record.ttl | default('-1') }}",
+        "ip": "{{ a_aaaa_record.ipv4 | default('0.0.0.0') | string }}",
+        "ip6": "{{ a_aaaa_record.ipv6 | default('::') | string }}",
+        "ttl": "{{ a_aaaa_record.ttl | default('-1') | string }}",
         "source_type": "{{ a_aaaa_record.ip_type | default('ipv4') }}"
       }
   register: fad_dns_zone_a_aaaa_record_post_result
