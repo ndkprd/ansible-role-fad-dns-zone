@@ -55,6 +55,39 @@
   tags:
     - fad_dns_zones
 
+- name: Update A or AAAA Record if it fail idempotency check for domain {{ fad_dns_zone_a_aaaa_record_name }}
+  ansible.builtin.uri:
+    method: PUT
+    url: "{{ fad_api_endpoint_dns_zone_a_aaaa_record }}"
+    body_format: "{{ fad_api_uri_params.body_format }}"
+    validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+    return_content: "{{ fad_api_uri_params.return_content }}"
+    status_code: "{{ fad_api_uri_params.status_code }}"
+    headers: "{{ fad_api_header }}"
+    body: |
+      {
+        "mkey": "{{ a_aaaa_record.id }}",
+        "hostname": "{{ a_aaaa_record.hostname }}",
+        "ip": "{{ a_aaaa_record.ipv4 }}",
+        "ip6": "{{ a_aaaa_record.ipv6 }}",
+        "ttl": "{{ a_aaaa_record.ttl }}",
+        "source_type": "{{ a_aaaa_record.ip_type }}"
+      }
+  register: fad_dns_zone_a_aaaa_record_post_result
+  delegate_to: localhost
+  when: >
+    (fad_dns_zone_a_aaaa_record_existing_data.json.payload.mkey is defined) and
+    (fad_dns_zone_a_aaaa_record_existing_data.json.payload.hostname != a_aaa_record.hostname or
+    fad_dns_zone_a_aaaa_record_existing_data.json.payload.ip != a_aaa_record.ipv4 or
+    fad_dns_zone_a_aaaa_record_existing_data.json.payload.ip6 != a_aaa_record.ipv6 or
+    fad_dns_zone_a_aaaa_record_existing_data.json.payload.ttl != a_aaa_record.ttl or
+    fad_dns_zone_a_aaaa_record_existing_data.json.payload.source_type != a_aaa_record.ip_type
+    )
+  changed_when: fad_dns_zone_a_aaaa_record_post_result.json.payload == 0
+  failed_when: (fad_dns_zone_a_aaaa_record_post_result.json.payload != 0) and (fad_dns_zone_a_aaaa_record_post_result.json.payload != -15)
+  tags:
+    - fad_dns_zones
+
 - name: Check if the A or AAAA Record data has changed for domain {{ fad_dns_zone_a_aaaa_record_name }}
   ansible.builtin.uri:
     method: GET

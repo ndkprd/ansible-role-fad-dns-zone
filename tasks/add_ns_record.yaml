@@ -56,6 +56,40 @@
   tags:
     - fad_dns_zones
 
+- name: Update NS Record if it fails idempotent check {{ fad_dns_zone_ns_record_name }}
+  ansible.builtin.uri:
+    method: POST
+    url: "{{ fad_api_endpoint_dns_zone_ns_record }}"
+    body_format: "{{ fad_api_uri_params.body_format }}"
+    validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+    return_content: "{{ fad_api_uri_params.return_content }}"
+    status_code: "{{ fad_api_uri_params.status_code }}"
+    headers: "{{ fad_api_header }}"
+    body: |
+      {
+        "mkey": "{{ ns_record.id }}",
+        "host_name": "{{ ns_record.hostname }}",
+        "domain_name": "{{ ns_record.domain_name }}",
+        "ip": "{{ ns_record.ipv4 }}",
+        "ip6": "{{ ns_record.ipv6 }}",
+        "ttl": "{{ ns_record.ttl }}",
+        "type": "{{ ns_record.ip_type }}"
+      }
+  register: fad_dns_zone_ns_record_post_result
+  delegate_to: localhost
+  when: >
+    (fad_dns_zone_ns_record_existing_data.json.payload.mkey is defined) and
+    (fad_dns_zone_ns_record_existing_data.json.payload.host_name != ns_record.hostname or
+    fad_dns_zone_ns_record_existing_data.json.payload.ip != ns_record.ipv4 or
+    fad_dns_zone_ns_record_existing_data.json.payload.ip6 != ns_record.ipv6 or
+    fad_dns_zone_ns_record_existing_data.json.payload.ttl != ns_record.ttl or
+    fad_dns_zone_ns_record_existing_data.json.payload.type != ns_record.ip_type
+    )
+  changed_when: fad_dns_zone_ns_record_post_result.json.payload == 0
+  failed_when: (fad_dns_zone_ns_record_post_result.json.payload != 0) and (fad_dns_zone_ns_record_post_result.json.payload != -15)
+  tags:
+    - fad_dns_zones
+
 - name: Check if the NS Record data has changed for domain {{ fad_dns_zone_ns_record_name }}
   ansible.builtin.uri:
     method: GET
