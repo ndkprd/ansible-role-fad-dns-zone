@@ -29,7 +29,7 @@
   - fad_dns_zones
   - debug
 
-- name: Create new root GLB Host if entry doesn't exists yet for zone {{ fad_dns_zone_name }}
+- name: Create new root GLB Host if it doesn't exist  for zone {{ fad_dns_zone_name }}
   ansible.builtin.uri:
     method: POST
     url: "{{ fad_api_endpoint_glb_host }}"

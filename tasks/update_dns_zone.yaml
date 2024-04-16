@@ -100,3 +100,11 @@
   ansible.builtin.include_tasks: update_dns_policy_zone_list.yaml
   tags:
     - fad_dns_zones
+
+- name: Update/create A and AAAA record for zone {{ fad_dns_zone_name }}
+  ansible.builtin.include_tasks: add_a_aaaa_record.yaml
+  loop: "{{ dns_zone.a_aaaa_records }}"
+  loop_control:
+    loop_var: a_aaaa_record
+  tags:
+    - fad_dns_zones
