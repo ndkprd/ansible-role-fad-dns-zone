@@ -108,3 +108,11 @@
     loop_var: a_aaaa_record
   tags:
     - fad_dns_zones
+
+- name: Update/create NS record for zone {{ fad_dns_zone_name }}
+  ansible.builtin.include_tasks: add_ns_record.yaml
+  loop: "{{ dns_zone.ns_records }}"
+  loop_control:
+    loop_var: add_ns_record.yaml
+  tags:
+    - fad_dns_zones
