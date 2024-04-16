@@ -42,10 +42,10 @@
       {
         "mkey": "{{ a_aaaa_record.id }}",
         "hostname": "{{ a_aaaa_record.hostname }}",
-        "ip": "{{ a_aaaa_record.ipv4 }}",
-        "ip6": "{{ a_aaaa_record.ipv6 }}",
-        "ttl": "{{ a_aaaa_record.ttl }}",
-        "source_type": "{{ a_aaaa_record.ip_type }}"
+        "ip": "{{ a_aaaa_record.ipv4 | default('0.0.0.0') }}",
+        "ip6": "{{ a_aaaa_record.ipv6 | default('::') }}",
+        "ttl": "{{ a_aaaa_record.ttl | default('-1') }}",
+        "source_type": "{{ a_aaaa_record.ip_type | default('ipv4') }}"
       }
   register: fad_dns_zone_a_aaaa_record_post_result
   delegate_to: localhost
@@ -68,10 +68,10 @@
       {
         "mkey": "{{ a_aaaa_record.id }}",
         "hostname": "{{ a_aaaa_record.hostname }}",
-        "ip": "{{ a_aaaa_record.ipv4 }}",
-        "ip6": "{{ a_aaaa_record.ipv6 }}",
-        "ttl": "{{ a_aaaa_record.ttl }}",
-        "source_type": "{{ a_aaaa_record.ip_type }}"
+        "ip": "{{ a_aaaa_record.ipv4 | default('0.0.0.0') }}",
+        "ip6": "{{ a_aaaa_record.ipv6 | default('::') }}",
+        "ttl": "{{ a_aaaa_record.ttl | default('-1') }}",
+        "source_type": "{{ a_aaaa_record.ip_type | default('ipv4') }}"
       }
   register: fad_dns_zone_a_aaaa_record_post_result
   delegate_to: localhost
