@@ -55,7 +55,7 @@
   tags:
     - fad_dns_zones
 
-- name: Update A or AAAA Record if it fail idempotency check for domain {{ fad_dns_zone_a_aaaa_record_name }}
+- name: Update A or AAAA Record if it fail idempotent check for domain {{ fad_dns_zone_a_aaaa_record_name }}
   ansible.builtin.uri:
     method: PUT
     url: "{{ fad_api_endpoint_dns_zone_a_aaaa_record }}"
@@ -77,11 +77,11 @@
   delegate_to: localhost
   when: >
     (fad_dns_zone_a_aaaa_record_existing_data.json.payload.mkey is defined) and
-    (fad_dns_zone_a_aaaa_record_existing_data.json.payload.hostname != a_aaa_record.hostname or
+    (fad_dns_zone_a_aaaa_record_existing_data.json.payload.hostname != a_aaaa_record.hostname or
     fad_dns_zone_a_aaaa_record_existing_data.json.payload.ip != a_aaa_record.ipv4 or
-    fad_dns_zone_a_aaaa_record_existing_data.json.payload.ip6 != a_aaa_record.ipv6 or
-    fad_dns_zone_a_aaaa_record_existing_data.json.payload.ttl != a_aaa_record.ttl or
-    fad_dns_zone_a_aaaa_record_existing_data.json.payload.source_type != a_aaa_record.ip_type
+    fad_dns_zone_a_aaaa_record_existing_data.json.payload.ip6 != a_aaaa_record.ipv6 or
+    fad_dns_zone_a_aaaa_record_existing_data.json.payload.ttl != a_aaaa_record.ttl or
+    fad_dns_zone_a_aaaa_record_existing_data.json.payload.source_type != a_aaaa_record.ip_type
     )
   changed_when: fad_dns_zone_a_aaaa_record_post_result.json.payload == 0
   failed_when: (fad_dns_zone_a_aaaa_record_post_result.json.payload != 0) and (fad_dns_zone_a_aaaa_record_post_result.json.payload != -15)
