@@ -78,10 +78,10 @@
   when: >
     (fad_dns_zone_a_aaaa_record_existing_data.json.payload.mkey is defined) and
     (fad_dns_zone_a_aaaa_record_existing_data.json.payload.hostname != a_aaaa_record.hostname or
-    fad_dns_zone_a_aaaa_record_existing_data.json.payload.ip != a_aaaa_record.ipv4 or
-    fad_dns_zone_a_aaaa_record_existing_data.json.payload.ip6 != a_aaaa_record.ipv6 or
-    fad_dns_zone_a_aaaa_record_existing_data.json.payload.ttl != a_aaaa_record.ttl or
-    fad_dns_zone_a_aaaa_record_existing_data.json.payload.source_type != a_aaaa_record.ip_type
+    fad_dns_zone_a_aaaa_record_existing_data.json.payload.ip != a_aaaa_record.ipv4 | default('0.0.0.0') | string or
+    fad_dns_zone_a_aaaa_record_existing_data.json.payload.ip6 != a_aaaa_record.ipv6 | default('::') | string or
+    fad_dns_zone_a_aaaa_record_existing_data.json.payload.ttl != a_aaaa_record.ttl | default('-1') | string or
+    fad_dns_zone_a_aaaa_record_existing_data.json.payload.source_type != a_aaaa_record.ip_type | default('ipv4')
     )
   changed_when: fad_dns_zone_a_aaaa_record_post_result.json.payload == 0
   failed_when: (fad_dns_zone_a_aaaa_record_post_result.json.payload != 0) and (fad_dns_zone_a_aaaa_record_post_result.json.payload != -15)
