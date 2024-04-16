@@ -60,7 +60,7 @@
     headers: "{{ fad_api_header }}"
     body: |
       {
-        "zone_list": "{{ fad_dns_policy_existing_data.json.payload.zone_list }}fqdn_generate_{{ dns_zone.name }}. "
+        "zone_list": "{{ fad_dns_policy_existing_data.json.payload.zone_list | default('') }}fqdn_generate_{{ dns_zone.name }}. "
       }
   delegate_to: localhost
   register: fad_dns_policy_put_result
