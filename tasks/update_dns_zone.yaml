@@ -98,7 +98,7 @@
 
 - name: Update/create A and AAAA record for zone {{ fad_dns_zone_name }}
   ansible.builtin.include_tasks: add_a_aaaa_record.yaml
-  loop: "{{ dns_zone.a_aaaa_records | default('') }}"
+  loop: "{{ dns_zone.a_aaaa_records | default([]) }}"
   loop_control:
     loop_var: a_aaaa_record
   tags:
@@ -106,7 +106,7 @@
 
 - name: Update/create NS record for zone {{ fad_dns_zone_name }}
   ansible.builtin.include_tasks: add_ns_record.yaml
-  loop: "{{ dns_zone.ns_records | default('') }}"
+  loop: "{{ dns_zone.ns_records | default([]) }}"
   loop_control:
     loop_var: ns_record
   tags:
@@ -114,7 +114,7 @@
 
 - name: Update/create PTR record for zone {{ fad_dns_zone_name }}
   ansible.builtin.include_tasks: add_ptr_record.yaml
-  loop: "{{ dns_zone.ptr_records | default('') }}"
+  loop: "{{ dns_zone.ptr_records | default([]) }}"
   loop_control:
     loop_var: ptr_record
   tags:
