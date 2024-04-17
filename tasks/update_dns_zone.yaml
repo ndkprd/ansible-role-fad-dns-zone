@@ -101,6 +101,9 @@
   loop: "{{ dns_zone.a_aaaa_records | default([]) }}"
   loop_control:
     loop_var: a_aaaa_record
+  when: >
+    dns_zone.a_aaaa_records is defined and
+    dns_zone.a_aaaa_records | length > 0
   tags:
     - fad_dns_zones
 
@@ -109,6 +112,9 @@
   loop: "{{ dns_zone.ns_records | default([]) }}"
   loop_control:
     loop_var: ns_record
+  when: >
+    dns_zone.ns_records is defined and
+    dns_zone.ns_records | length > 0
   tags:
     - fad_dns_zones
 
@@ -117,6 +123,9 @@
   loop: "{{ dns_zone.ptr_records | default([]) }}"
   loop_control:
     loop_var: ptr_record
+  when: >
+    dns_zone.ptr_records is defined and
+    dns_zone.ptr_records | length > 0
   tags:
     - fad_dns_zones
 
