@@ -129,6 +129,17 @@
   tags:
     - fad_dns_zones
 
+- name: Update/create CNAME record for zone {{ fad_dns_zone_name }}
+  ansible.builtin.include_tasks: add_cname_record.yaml
+  loop: "{{ dns_zone.cname_records | default([]) }}"
+  loop_control:
+    loop_var: ptr_record
+  when: >
+    dns_zone.cname_records is defined and
+    dns_zone.cname_records | length > 0
+  tags:
+    - fad_dns_zones
+
 - name: Update DNS Policy so zone_list include this zone {{ fad_dns_zone_name }}
   ansible.builtin.include_tasks: update_dns_policy_zone_list.yaml
   tags:
