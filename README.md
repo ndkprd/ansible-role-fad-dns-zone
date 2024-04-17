@@ -16,8 +16,35 @@ An Ansible role to create DNS zone on FortiADC devices.
   hosts: fortiadc
   become: true
   gather_facts: no
-  vars_files:
-    - vars.yaml
+  vars:
+    fad_vdom: "root"
+    fad_dns_policy:
+      - name: "DEFAULT_DNS_POLICY" # Global DNS Policy mkey
+        source_address: "any" # valid Address Group entry mkey used as source
+        destination_address: "any" # valid Address Group entry used as destination
+        dns64_list: ""
+        dnssec_validate_status: "disable" # "enable" or "disable"
+        forward: "first" # "first" or "only"
+        forwarders: "" # valid Remote DNS Servers entry mkey
+        recursion_status: "disable" # "enable" or "disable"
+        rrlimit: "" # valid Response Rate Limit 
+    fad_dns_zones:
+      - name: "infra.ndkprd.com" # base domain without dot, will be converted to the mkey by task
+        dns_policy: "DEFAULT_DNS_POLICY" # valid DNS Policy mkey
+        ttl: "86400" # zone's time-to-live
+        negative_ttl: "3600" # zone's negative time-to-live
+        primary_ns_ipv4: "10.10.10.2" # primary IPv4 nameserver
+        primary_ns_ipv6: "::" # primary IPv6 nameserver
+        primary_ns_name: "ns" # primary nameserver hostname
+        responsible_mail: "admin" #responsible mail, use dot if include domain
+        allow_transfer: "" # valid Address Group mkey
+        a_aaaa_record:
+          - hostname: ns # hostname
+            id: "1001" # high ID to be used as mkey
+            ipv4: "10.10.10.2" # ip to be resolved to
+            ipv6: "::"
+            ttl: "-1" # time-to-live, will inherit zone if "-1"
+            source_type: "ipv4" # or ipv6
 
   roles:
     - role: fortiadc-create-zone
@@ -34,61 +61,6 @@ fad3 ansible_host=fad3.infra.ndkprd.com fad_apitoken=mysupersecrettoken3 fad_vdo
 [fortiadc:vars]
 fad_http_port=80
 fad_https_port=443
-
-```
-
-### Needed Variables Example
-
-```
----
-# ./vars/main.yaml
-
-# GLOBAL-LOAD-BALANCE ZONE
-fad_domains:
-  - name: infra.ndkprd.com # base domain without dot at the end
-    scope: public # scope for naming only, I personally use "public" and "local"
-    ttl: 86400 
-    negative_ttl: 3600 
-    primary_ns_ip: 10.10.10.1
-    primary_ns_name: ns
-    responsible_mail: admin.ndkprd.com.
-  - name: devops.ndkprd.com
-    scope: public
-    ttl: 86400
-    negative_ttl: 3600
-    primary_ns_ip: 10.10.10.1
-    primary_ns_name: ns
-    responsible_mail: admin.ndkprd.com.
-
-# GLOBAL-DNS-SERVER POLICY
-fad_dns_policy:
-  name: DEFAULT_DNS_POLICY # name of the DNS policy used by FAD
-
-#GLOBAL-DNS-SERVER A RECORDS
-zone_aaa_records:
-  # devops.ndkprd.com
-  - hostname: ns
-    domain_name: devops.ndkprd.com
-    ip: 10.10.10.1
-    mkey: 1001 # high number of mkey to make sure it's not conflicted
-  # infra.ndkprd.com
-  - hostname: ns
-    domain_name: infra.ndkprd.com
-    ip: 10.10.10.1
-    mkey: 1001
-
-#GLOBAL-DNS-SERVER NS RECORD
-zone_ns_records:
-  # devops.asdp.id
-  - hostname: ns
-    domain_name: devops.ndkprd.com
-    ip: 10.10.10.10
-    mkey: 1001
-  # devsecops.asdp.id:
-  - hostname: ns
-    domain_name: infra.ndkprd.com
-    ip: 10.10.10.10
-    mkey: 1001
 
 ```
 
