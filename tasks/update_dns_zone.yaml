@@ -96,11 +96,6 @@
     - fad_dns_zones
     - debug
 
-- name: Update DNS Policy so zone_list include this zone {{ fad_dns_zone_name }}
-  ansible.builtin.include_tasks: update_dns_policy_zone_list.yaml
-  tags:
-    - fad_dns_zones
-
 - name: Update/create A and AAAA record for zone {{ fad_dns_zone_name }}
   ansible.builtin.include_tasks: add_a_aaaa_record.yaml
   loop: "{{ dns_zone.a_aaaa_records }}"
@@ -114,5 +109,18 @@
   loop: "{{ dns_zone.ns_records }}"
   loop_control:
     loop_var: ns_record
+  tags:
+    - fad_dns_zones
+
+- name: Update/create PTR record for zone {{ fad_dns_zone_name }}
+  ansible.builtin.include_tasks: add_ptr_record.yaml
+  loop: "{{ dns_zone.ptr_records }}"
+  loop_control:
+    loop_var: ptr_record
+  tags:
+    - fad_dns_zones
+
+- name: Update DNS Policy so zone_list include this zone {{ fad_dns_zone_name }}
+  ansible.builtin.include_tasks: update_dns_policy_zone_list.yaml
   tags:
     - fad_dns_zones
