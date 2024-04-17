@@ -94,6 +94,7 @@ ansible-galaxy install -r requirements.yaml
         caa_records: []
         mx_records: []
 
+
   roles:
     - role: fortiadc-dns-zones
 ```
@@ -101,6 +102,7 @@ ansible-galaxy install -r requirements.yaml
 ### Hosts Example
 
 ```
+
 [fortiadc]
 fad1 ansible_host=fad1.infra.ndkprd.com fad_apitoken=mysupersecrettoken1 fad_vdom=root
 fad2 ansible_host=fad2.infra.ndkprd.com fad_apitoken=mysupersecrettoken2 fad_vdom=root
