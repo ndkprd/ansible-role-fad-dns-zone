@@ -4,6 +4,20 @@
 
 An Ansible role to create/update Global DNS Zones and their DNS entries on FortiADC devices via REST API.
 
+## Roadmap
+
+- [x] create/update root GLB Hosts for domain to automatically create fqdn_generate zones (I did this since you can't change Primary Zones to FQDN Generate Zones, and you can't use GLB Hosts on existing Primary Zones)
+- [x] move the zones into DNS Policy 
+- [x] create/update A/AAAA Records
+- [x] create/update NS Records
+- [x] create/update PTR Records
+- [ ] create/update CNAME Records
+- [ ] create/update TXT records
+- [ ] create/update CAA records
+- [ ] create/update MX records
+
+(yeah, this shouldn't be version 1.0.0, I messed up)
+
 ## Usage
 
 ### Install Role
@@ -66,13 +80,19 @@ ansible-galaxy install -r requirements.yaml
         primary_ns_name: "ns" # primary nameserver hostname
         responsible_mail: "admin" #responsible mail, use dot if include domain
         allow_transfer: "" # valid Address Group mkey
-        a_aaaa_record:
+        a_aaaa_records:
           - hostname: ns # hostname
             id: "1001" # high ID to be used as mkey
             ipv4: "10.10.10.2" # ip to be resolved to
             ipv6: "::"
             ttl: "-1" # time-to-live, will inherit zone if "-1"
             source_type: "ipv4" # or ipv6
+        ns_records: []
+        ptr_records: []
+        cname_records: []
+        txt_records: []
+        caa_records: []
+        mx_records: []
 
   roles:
     - role: fortiadc-dns-zones
