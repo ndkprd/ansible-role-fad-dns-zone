@@ -1,0 +1,4 @@
+{
+    "ansible.python.interpreterPath": "c:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+    "ansible.validation.lint.enabled": false
+}

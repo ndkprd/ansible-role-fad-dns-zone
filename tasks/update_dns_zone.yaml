@@ -1,0 +1,135 @@
+---
+
+- name: Set DNS Zone endpoint and variables for zone {{ dns_zone.name }}
+  ansible.builtin.set_fact:
+    fad_api_endpoint_dns_zone: "https://{{ ansible_host }}/api/global_dns_server_zone?vdom={{ fad_vdom }}&mkey=fqdn_generate_{{ dns_zone.name }}."
+    fad_dns_zone_name: "fqdn_generate_{{dns_zone.name }}."
+  tags:
+    - fad_dns_zones
+
+- name: Get the current configuration for zone {{ fad_dns_zone_name }}
+  ansible.builtin.uri:
+    method: GET
+    url: "{{ fad_api_endpoint_dns_zone }}"
+    body_format: "{{ fad_api_uri_params.body_format }}"
+    validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+    return_content: "{{ fad_api_uri_params.return_content }}"
+    status_code: "{{ fad_api_uri_params.status_code }}"
+    headers: "{{ fad_api_header }}"
+  register: fad_dns_zone_existing_data
+  delegate_to: localhost
+  tags:
+    - fad_dns_zones
+
+- name: Print out the DNS Zone existing data for zone {{ fad_dns_zone_name }}
+  ansible.builtin.debug:
+    var:  fad_dns_zone_existing_data.json.payload
+  tags:
+    - fad_dns_zones
+    - debug
+
+- name: Write DNS Zone request body and update.
+  block:
+    - name: Write DNS Zone request body json for zone {{ fad_dns_zone_name }}
+      ansible.builtin.set_fact:
+        request_body: |
+          {
+            "ttl": "{{ dns_zone.ttl }}",
+            "negative_ttl": "{{ dns_zone.negative_ttl }}",
+            "primary_server_ip": "{{ dns_zone.primary_ns_ipv4 }}",
+            "primary_server_ip6": "{{ dns_zone.primary_ns_ipv6 }}",
+            "primary_server_name": "{{ dns_zone.primary_ns_name }}",
+            "responible_mail": "{{ dns_zone.responsible_mail }}",
+            "allow_transfer": "{{ dns_zone.allow_transfer }}"
+          }
+    - name: Print out the value of request body json for zone {{ fad_dns_zone_name }}
+      ansible.builtin.debug:
+        var: request_body
+      tags:
+        - debug
+    - name: Update DNS Zone configuration for zone {{ fad_dns_zone_name }}
+      ansible.builtin.uri:
+        method: PUT
+        url: "{{ fad_api_endpoint_dns_zone }}"
+        body_format: "{{ fad_api_uri_params.body_format }}"
+        validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+        return_content: "{{ fad_api_uri_params.return_content }}"
+        status_code: "{{ fad_api_uri_params.status_code }}"
+        headers: "{{ fad_api_header }}"
+        body: "{{ request_body }}"
+      register: fad_dns_zone_put_result
+      changed_when: fad_dns_zone_put_result.json.payload == 0
+      failed_when: (fad_dns_zone_put_result.json.payload != 0) and (fad_dnz_zone_put_result.json.payload != -15)
+      delegate_to: localhost
+  when: >
+    (fad_dns_zone_existing_data.json.payload.mkey is defined) and
+    (fad_dns_zone_existing_data.json.payload.ttl != dns_zone.ttl or
+    fad_dns_zone_existing_data.json.payload.negative_ttl != dns_zone.negative_ttl or
+    fad_dns_zone_existing_data.json.payload.primary_server_ip != dns_zone.primary_ns_ipv4 or
+    fad_dns_zone_existing_data.json.payload.primary_server_ip6 != dns_zone.primary_ns_ipv6 or
+    fad_dns_zone_existing_data.json.payload.primary_server_name != dns_zone.primary_ns_name or
+    fad_dns_zone_existing_data.json.payload.responible_mail != dns_zone.responsible_mail or 
+    fad_dns_zone_existing_data.json.payload.allow_transfer != dns_zone.allow_transfer)
+  tags:
+    - fad_dns_zones
+
+- name: Check if the DNS Zone data has changed for zone {{ fad_dns_zone_name }}
+  ansible.builtin.uri:
+    method: GET
+    url: "{{ fad_api_endpoint_dns_zone }}"
+    body_format: "{{ fad_api_uri_params.body_format }}"
+    validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+    return_content: "{{ fad_api_uri_params.return_content }}"
+    status_code: "{{ fad_api_uri_params.status_code }}"
+    headers: "{{ fad_api_header }}"
+  register: fad_dns_zone_new_data
+  delegate_to: localhost
+  changed_when: fad_dns_zone_new_data.json.payload != fad_dns_zone_existing_data.json.payload
+  tags:
+    - fad_dns_zones
+    - debug
+
+- name: Print out the DNS Zone data for zone {{ fad_dns_zone_name }}
+  ansible.builtin.debug:
+    var:  fad_dns_zone_root_glb_new_data.json.payload
+  tags:
+    - fad_dns_zones
+    - debug
+
+- name: Update/create A and AAAA record for zone {{ fad_dns_zone_name }}
+  ansible.builtin.include_tasks: add_a_aaaa_record.yaml
+  loop: "{{ dns_zone.a_aaaa_records | default([]) }}"
+  loop_control:
+    loop_var: a_aaaa_record
+  when: >
+    dns_zone.a_aaaa_records is defined and
+    dns_zone.a_aaaa_records | length > 0
+  tags:
+    - fad_dns_zones
+
+- name: Update/create NS record for zone {{ fad_dns_zone_name }}
+  ansible.builtin.include_tasks: add_ns_record.yaml
+  loop: "{{ dns_zone.ns_records | default([]) }}"
+  loop_control:
+    loop_var: ns_record
+  when: >
+    dns_zone.ns_records is defined and
+    dns_zone.ns_records | length > 0
+  tags:
+    - fad_dns_zones
+
+- name: Update/create PTR record for zone {{ fad_dns_zone_name }}
+  ansible.builtin.include_tasks: add_ptr_record.yaml
+  loop: "{{ dns_zone.ptr_records | default([]) }}"
+  loop_control:
+    loop_var: ptr_record
+  when: >
+    dns_zone.ptr_records is defined and
+    dns_zone.ptr_records | length > 0
+  tags:
+    - fad_dns_zones
+
+- name: Update DNS Policy so zone_list include this zone {{ fad_dns_zone_name }}
+  ansible.builtin.include_tasks: update_dns_policy_zone_list.yaml
+  tags:
+    - fad_dns_zones
