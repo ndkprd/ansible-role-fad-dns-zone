@@ -3,7 +3,7 @@
 - name: Set endpoints and variables for {{ dns_zone.name }}
   ansible.builtin.set_fact:
     fad_api_endpoint_dns_zone_cname_record: "https://{{ ansible_host }}/api/global_dns_server_zone_child_cname_record?vdom={{ fad_vdom }}&pkey=fqdn_generate_{{ dns_zone.name }}.&mkey={{ cname_record.id }}"
-    fad_dns_zone_cname_record_name: "{{ cname_record.fqdn }}"
+    fad_dns_zone_cname_record_name: "{{ cname_record.alias }}.{{ dns_zone.name }}"
     fad_dns_zone_cname_record_request_body: |
       {
         "mkey": "{{ cname_record.id | string }}",

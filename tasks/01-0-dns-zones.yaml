@@ -3,7 +3,7 @@
 - name: Set DNS Zone endpoint and variables for zone {{ dns_zone.name }}
   ansible.builtin.set_fact:
     fad_api_endpoint_dns_zone: "https://{{ ansible_host }}/api/global_dns_server_zone?vdom={{ fad_vdom }}&mkey=fqdn_generate_{{ dns_zone.name }}."
-    fad_dns_zone_name: "fqdn_generate_{{dns_zone.name }}."
+    fad_dns_zone_name: "fqdn_generate_{{ dns_zone.name }}."
   tags:
     - fad_dns_zones
 

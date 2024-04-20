@@ -3,12 +3,12 @@
 - name: Set endpoints and variables for {{ dns_zone.name }}
   ansible.builtin.set_fact:
     fad_api_endpoint_dns_zone_txt_record: "https://{{ ansible_host }}/api/global_dns_server_zone_child_txt_record?vdom={{ fad_vdom }}&pkey=fqdn_generate_{{ dns_zone.name }}.&mkey={{ txt_record.id }}"
-    fad_dns_zone_txt_record_name: "{{ txt_record.fqdn }}"
+    fad_dns_zone_txt_record_name: "{{ txt_record.name }}"
     fad_dns_zone_txt_record_request_body: |
       {
         "mkey": "{{ txt_record.id | string }}",
-        "alias": "{{ txt_record.name | string }}",
-        "target": "{{ txt_record.text | string }}",
+        "name": "{{ txt_record.name | string }}",
+        "text": "{{ txt_record.text | string }}",
         "ttl": "{{ txt_record.ttl | default('-1') | string }}"
       }
   tags:
