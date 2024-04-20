@@ -95,7 +95,6 @@ ansible-galaxy install -r requirements.yaml
         caa_records: []
         mx_records: []
 
-
   roles:
     - role: fortiadc-dns-zones
 ```
@@ -116,6 +115,17 @@ fad3 ansible_host=fad3.infra.ndkprd.com fad_apitoken=mysupersecrettoken3 fad_vdo
 I added quiet lots of debug task, mainly to check if the variable I set is correct. These tags basically just print out the var that the previous task set/register. You can skip them altogether by skipping tasks with `debug` tags.
 
 For example, if you're using CLI, you can just go `ansible-playbook playbook.yaml --skip-tags debug`.
+
+Since this roles cover all the DNS type, if you only want to run on certain entry type only, you can use the following tags:
+
+- fad_dns_zone_a_aaaa_records
+- fad_dns_zone_ns_records
+- fad_dns_zone_ptr_records
+- fad_dns_zone_cname_records
+- fad_dns_zone_txt_records
+- fad_dns_zone_mx_records
+- fad_dns_zone_srv_records
+- fad_dns_zone_caa_records
 
 ## Limitation
 
