@@ -7,7 +7,8 @@
     fad_dns_zone_mx_record_request_body: |
       {
         "mkey": "{{ mx_record.id | string }}",
-        "hostname": "{{ mx_record.hostname }}",
+        "domain_name": "{{ mx_record.domain_name | default('@') | string }}"
+        "hostname": "{{ mx_record.hostname | default('mail') }}",
         "ip": "{{ mx_record.ipv4 | default('0.0.0.0') | string }}",
         "ip6": "{{ mx_record.ipv6 | default('::') | string }}"
         "priority": "{{ mx_record.priority | default('10') | string }}"
@@ -73,7 +74,8 @@
   when: >
     (fad_dns_zone_mx_record_existing_data.json.payload.mkey is defined) and
     (
-    fad_dns_zone_mx_record_existing_data.json.payload.hostname != mx_record.name or
+    fad_dns_zone_mx_record_existing_data.json.payload.domain_name != mx_record.domain_name | default('@') | string or
+    fad_dns_zone_mx_record_existing_data.json.payload.hostname != mx_record.hostname | default('mail') or
     fad_dns_zone_mx_record_existing_data.json.payload.ip != mx_record.ipv4 | default('0.0.0.0') | string or
     fad_dns_zone_mx_record_existing_data.json.payload.ip6 != mx_record.ipv6 | default('::') | string or
     fad_dns_zone_mx_record_existing_data.json.payload.priority != mx_record.priority | default('10') | string or
