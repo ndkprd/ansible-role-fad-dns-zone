@@ -14,7 +14,8 @@ An Ansible role to create/update Global DNS Zones and their DNS entries on Forti
 - [x] create/update CNAME Records
 - [x] create/update TXT records
 - [ ] create/update CAA records
-- [ ] create/update MX records
+- [x] create/update MX records
+- [ ] crate/update SRV records
 
 (yeah, this shouldn't be version 1.0.0, I messed up)
 
