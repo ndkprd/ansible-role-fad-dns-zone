@@ -1,7 +1,7 @@
 ---
 
 - name: Trying to create fqdn_generate zone by adding domain root record
-  ansible.builtin.include_tasks: 00-glb-host-root.yaml
+  ansible.builtin.import_tasks: 00-glb-host-root.yaml
   loop: "{{ fad_dns_zones }}"
   loop_control:
     loop_var: dns_zone
