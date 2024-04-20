@@ -115,7 +115,7 @@
   tags:
     - fad_dns_zones
 
-- name: Update/create PTR record for zone {{ fad_dns_zone_name }}
+- name: Update/create PTR Record for zone {{ fad_dns_zone_name }}
   ansible.builtin.include_tasks: 01-c-dns-zone-ptr-record.yaml
   loop: "{{ dns_zone.ptr_records | default([]) }}"
   loop_control:
@@ -123,6 +123,28 @@
   when: >
     dns_zone.ptr_records is defined and
     dns_zone.ptr_records | length > 0
+  tags:
+    - fad_dns_zones
+
+- name: Update/create CNAME Record for zone {{ fad_dns_zone_name }}
+  ansible.builtin.include_tasks: 01-d-dns-zone-cname-record.yaml
+  loop: "{{ dns_zone.cname_records | default([]) }}"
+  loop_control:
+    loop_var: cname_record
+  when: >
+    dns_zone.cname_records is defined and
+    dns_zone.cname_records | length > 0
+  tags:
+    - fad_dns_zones
+
+- name: Update/create TXT Record for zone {{ fad_dns_zone_name }}
+  ansible.builtin.include_tasks: 01-e-dns-zone-txt-record.yaml
+  loop: "{{ dns_zone.txt_records | default([]) }}"
+  loop_control:
+    loop_var: txt_record
+  when: >
+    dns_zone.txt_records is defined and
+    dns_zone.txt_records | length > 0
   tags:
     - fad_dns_zones
 
