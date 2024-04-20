@@ -153,6 +153,18 @@
     - fad_dns_zones
     - fad_dns_zone_txt_records
 
+- name: Update/create MX Record for zone {{ fad_dns_zone_name }}
+  ansible.builtin.include_tasks: 01-f-dns-zone-mx-record.yaml
+  loop: "{{ dns_zone.txt_records | default([]) }}"
+  loop_control:
+    loop_var: mx_record
+  when: >
+    dns_zone.mx_records is defined and
+    dns_zone.mx_records | length > 0
+  tags:
+    - fad_dns_zones
+    - fad_dns_zone_mx_records
+
 - name: Update DNS Policy so zone_list include this zone {{ fad_dns_zone_name }}
   ansible.builtin.include_tasks: 01-z-dns-policy-zone-list.yaml
   tags:
