@@ -3,7 +3,6 @@
 - name: Set FAD DNS Policy REST API endpoint for {{ fad_dns_zone_name }}
   ansible.builtin.set_fact:
     fad_api_endpoint_dns_policy: https://{{ ansible_host }}/api/global_dns_server_policy?vdom={{ fad_vdom }}&mkey={{ dns_zone.dns_policy }}
-  delegate_to: localhost
   tags:
     - fad_dns_zones
 
@@ -24,7 +23,6 @@
     status_code: "{{ fad_api_uri_params.status_code }}"
     headers: "{{ fad_api_header }}"
   register: fad_dns_policy_existing_data
-  delegate_to: localhost
   tags:
     - fad_dns_zones
 
@@ -62,7 +60,6 @@
       {
         "zone_list": "{{ fad_dns_policy_existing_data.json.payload.zone_list | default('') }}fqdn_generate_{{ dns_zone.name }}. "
       }
-  delegate_to: localhost
   register: fad_dns_policy_put_result
   #when: host.domain is not in fad_dns_policy_existing_data.json.payload.zone_list
   failed_when: >
@@ -81,7 +78,6 @@
     status_code: "{{ fad_api_uri_params.status_code }}"
     headers: "{{ fad_api_header }}"
   register: fad_dns_policy_new_data
-  delegate_to: localhost
   changed_when: fad_dns_policy_new_data.json.payload.zone_list != fad_dns_policy_existing_data.json.payload.zone_list
   tags:
     - fad_dns_zones

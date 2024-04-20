@@ -17,7 +17,6 @@
     status_code: "{{ fad_api_uri_params.status_code }}"
     headers: "{{ fad_api_header }}"
   register: fad_dns_zone_a_aaaa_record_existing_data
-  delegate_to: localhost
   tags:
     - fad_dns_zones
 
@@ -48,7 +47,6 @@
         "source_type": "{{ a_aaaa_record.ip_type | default('ipv4') }}"
       }
   register: fad_dns_zone_a_aaaa_record_post_result
-  delegate_to: localhost
   when: fad_dns_zone_a_aaaa_record_existing_data.json.payload.mkey is undefined
   changed_when: fad_dns_zone_a_aaaa_record_post_result.json.payload == 0
   failed_when: (fad_dns_zone_a_aaaa_record_post_result.json.payload != 0) and (fad_dns_zone_a_aaaa_record_post_result.json.payload != -15)
@@ -74,7 +72,6 @@
         "source_type": "{{ a_aaaa_record.ip_type | default('ipv4') }}"
       }
   register: fad_dns_zone_a_aaaa_record_post_result
-  delegate_to: localhost
   when: >
     (fad_dns_zone_a_aaaa_record_existing_data.json.payload.mkey is defined) and
     (fad_dns_zone_a_aaaa_record_existing_data.json.payload.hostname != a_aaaa_record.hostname or
@@ -98,7 +95,6 @@
     status_code: "{{ fad_api_uri_params.status_code }}"
     headers: "{{ fad_api_header }}"
   register: fad_dns_zone_a_aaaa_record_new_data
-  delegate_to: localhost
   changed_when: fad_dns_zone_a_aaaa_record_new_data.json.payload != fad_dns_zone_a_aaaa_record_existing_data.json.payload
   tags:
     - fad_dns_zones

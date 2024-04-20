@@ -17,7 +17,6 @@
     status_code: "{{ fad_api_uri_params.status_code }}"
     headers: "{{ fad_api_header }}"
   register: fad_dns_zone_existing_data
-  delegate_to: localhost
   tags:
     - fad_dns_zones
 
@@ -60,16 +59,15 @@
       register: fad_dns_zone_put_result
       changed_when: fad_dns_zone_put_result.json.payload == 0
       failed_when: (fad_dns_zone_put_result.json.payload != 0) and (fad_dnz_zone_put_result.json.payload != -15)
-      delegate_to: localhost
-  when: >
-    (fad_dns_zone_existing_data.json.payload.mkey is defined) and
-    (fad_dns_zone_existing_data.json.payload.ttl != dns_zone.ttl or
-    fad_dns_zone_existing_data.json.payload.negative_ttl != dns_zone.negative_ttl or
-    fad_dns_zone_existing_data.json.payload.primary_server_ip != dns_zone.primary_ns_ipv4 or
-    fad_dns_zone_existing_data.json.payload.primary_server_ip6 != dns_zone.primary_ns_ipv6 or
-    fad_dns_zone_existing_data.json.payload.primary_server_name != dns_zone.primary_ns_name or
-    fad_dns_zone_existing_data.json.payload.responible_mail != dns_zone.responsible_mail or 
-    fad_dns_zone_existing_data.json.payload.allow_transfer != dns_zone.allow_transfer)
+      when: >
+        (fad_dns_zone_existing_data.json.payload.mkey is defined) and
+        (fad_dns_zone_existing_data.json.payload.ttl != dns_zone.ttl or
+        fad_dns_zone_existing_data.json.payload.negative_ttl != dns_zone.negative_ttl or
+        fad_dns_zone_existing_data.json.payload.primary_server_ip != dns_zone.primary_ns_ipv4 or
+        fad_dns_zone_existing_data.json.payload.primary_server_ip6 != dns_zone.primary_ns_ipv6 or
+        fad_dns_zone_existing_data.json.payload.primary_server_name != dns_zone.primary_ns_name or
+        fad_dns_zone_existing_data.json.payload.responible_mail != dns_zone.responsible_mail or 
+        fad_dns_zone_existing_data.json.payload.allow_transfer != dns_zone.allow_transfer)
   tags:
     - fad_dns_zones
 
@@ -83,7 +81,6 @@
     status_code: "{{ fad_api_uri_params.status_code }}"
     headers: "{{ fad_api_header }}"
   register: fad_dns_zone_new_data
-  delegate_to: localhost
   changed_when: fad_dns_zone_new_data.json.payload != fad_dns_zone_existing_data.json.payload
   tags:
     - fad_dns_zones
