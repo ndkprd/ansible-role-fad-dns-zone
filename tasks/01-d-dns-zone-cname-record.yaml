@@ -72,7 +72,7 @@
     (
     fad_dns_zone_cname_record_existing_data.json.payload.alias != cname_record.alias or
     fad_dns_zone_cname_record_existing_data.json.payload.target != cname_record.target or
-    fad_dns_zone_cname_record_existing_data.json.payload.ttl != cname_record.ttl default('-1') | string
+    fad_dns_zone_cname_record_existing_data.json.payload.ttl != cname_record.ttl | default('-1') | string
     )
   changed_when: fad_dns_zone_cname_record_post_result.json.payload == 0
   failed_when: (fad_dns_zone_cname_record_post_result.json.payload != 0) and (fad_dns_zone_cname_record_post_result.json.payload != -15)
