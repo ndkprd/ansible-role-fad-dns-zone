@@ -5,9 +5,13 @@
   loop: "{{ fad_dns_zones }}"
   loop_control:
     loop_var: dns_zone
+  tags:
+    - fad_dns_zones
 
 - name: Update the zone configuration
   ansible.builtin.include_tasks: 01-0-dns-zones.yaml
   loop: "{{ fad_dns_zones }}"
   loop_control:
     loop_var: dns_zone
+  tags:
+    - fad_dns_zones
