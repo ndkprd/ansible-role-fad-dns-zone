@@ -48,6 +48,13 @@ jobs:
           automatic_release_tag: "v${{ needs.bump-version.outputs.NEW_VERSION }}"
           prerelease: false
           title: "v${{ needs.bump-version.outputs.NEW_VERSION }}"
+      - name: Create a latest release.
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: "v${{ needs.bump-version.outputs.NEW_VERSION }}"
 
   push-to-galaxy:
     runs-on: ubuntu-latest
