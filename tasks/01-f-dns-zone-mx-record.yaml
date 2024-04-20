@@ -7,12 +7,12 @@
     fad_dns_zone_mx_record_request_body: |
       {
         "mkey": "{{ mx_record.id | string }}",
-        "domain_name": "{{ mx_record.domain_name | default('@') | string }}"
+        "domain_name": "{{ mx_record.domain_name | default('@') | string }}",
         "hostname": "{{ mx_record.hostname | default('mail') }}",
         "ip": "{{ mx_record.ipv4 | default('0.0.0.0') | string }}",
-        "ip6": "{{ mx_record.ipv6 | default('::') | string }}"
-        "priority": "{{ mx_record.priority | default('10') | string }}"
-        "type": "{{ mx_record.type | default('ipv4') }}"
+        "ip6": "{{ mx_record.ipv6 | default('::') | string }}",
+        "priority": "{{ mx_record.priority | default('10') | string }}",
+        "type": "{{ mx_record.type | default('ipv4') }}",
         "ttl": "{{ mx_record.ttl | default('-1') | string }}"
       }
   tags:
