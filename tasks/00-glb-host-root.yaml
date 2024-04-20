@@ -4,8 +4,6 @@
   ansible.builtin.set_fact:
     fad_api_endpoint_glb_host: "https://{{ ansible_host }}/api/global_load_balance_host?vdom={{ fad_vdom }}&mkey={{ dns_zone.name }}"
     fad_dns_zone_name: "fqdn_generate_{{dns_zone.name }}."
-  tags:
-    - fad_dns_zones
 
 - name: Check if the root GLB Host is exist for zone {{ fad_dns_zone_name }}
   ansible.builtin.uri:
@@ -17,15 +15,12 @@
     status_code: "{{ fad_api_uri_params.status_code }}"
     headers: "{{ fad_api_header }}"
   register: fad_dns_zone_root_glb_existing_data
-  tags:
-    - fad_dns_zones
 
 - name: Print out the existing root GLB Host value for zone {{ fad_dns_zone_name }}
   ansible.builtin.debug:
     var:  fad_dns_zone_root_glb_existing_data.json.payload
   when: fad_dns_zone_root_glb_existing_data.json.payload is defined
   tags:
-  - fad_dns_zones
   - debug
 
 - name: Create new root GLB Host if it doesn't exist  for zone {{ fad_dns_zone_name }}
@@ -47,8 +42,6 @@
   when: fad_dns_zone_root_glb_existing_data.json.payload.mkey is undefined
   changed_when: fad_dns_zone_root_glb_post_result.json.payload == 0
   failed_when: (fad_dns_zone_root_glb_post_result.json.payload != 0) and (fad_dns_zone_root_glb_post_result.json.payload != -15)
-  tags:
-    - fad_dns_zones
 
 - name: Check if the root GLB Host data has changed for zone {{ fad_dns_zone_name }}
   ansible.builtin.uri:
@@ -62,12 +55,10 @@
   register: fad_dns_zone_root_glb_new_data
   changed_when: fad_dns_zone_root_glb_new_data.json.payload != fad_dns_zone_root_glb_existing_data.json.payload
   tags:
-    - fad_dns_zones
     - debug
 
 - name: Print out the new root GLB Host value for zone {{ fad_dns_zone_name }}
   ansible.builtin.debug:
     var:  fad_dns_zone_root_glb_new_data.json.payload
   tags:
-  - fad_dns_zones
   - debug
