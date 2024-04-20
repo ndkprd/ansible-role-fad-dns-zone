@@ -44,7 +44,7 @@
         "host_name": "{{ ns_record.hostname }}",
         "domain_name": "{{ ns_record.domain_name }}",
         "ip": "{{ ns_record.ipv4 | default('0.0.0.0') | string }}",
-        "ip6": "{{ ns_record.ipv6| default('::') | string }}",
+        "ip6": "{{ ns_record.ipv6 | default('::') | string }}",
         "ttl": "{{ ns_record.ttl | default('-1') | string }}",
         "type": "{{ ns_record.ip_type | default('ipv4') | string }}"
       }
@@ -71,7 +71,7 @@
         "host_name": "{{ ns_record.hostname }}",
         "domain_name": "{{ ns_record.domain_name }}",
         "ip": "{{ ns_record.ipv4 | default('0.0.0.0') | string }}",
-        "ip6": "{{ ns_record.ipv6| default('::') | string }}",
+        "ip6": "{{ ns_record.ipv6 | default('::') | string }}",
         "ttl": "{{ ns_record.ttl | default('-1') | string }}",
         "type": "{{ ns_record.ip_type | default('ipv4') | string }}"
       }
