@@ -3,7 +3,7 @@
 - name: Set endpoints and variables for {{ dns_zone.name }}
   ansible.builtin.set_fact:
     fad_api_endpoint_dns_zone_txt_record: "https://{{ ansible_host }}/api/global_dns_server_zone_child_txt_record?vdom={{ fad_vdom }}&pkey=fqdn_generate_{{ dns_zone.name }}.&mkey={{ txt_record.id }}"
-    fad_dns_zone_txt_record_name: "{{ txt_record.name }}"
+    fad_dns_zone_txt_record_name: "{{ txt_record.name + '.' + dns_zone.name }}"
     fad_dns_zone_txt_record_request_body: |
       {
         "mkey": "{{ txt_record.id | string }}",
@@ -47,7 +47,7 @@
     return_content: "{{ fad_api_uri_params.return_content }}"
     status_code: "{{ fad_api_uri_params.status_code }}"
     headers: "{{ fad_api_header }}"
-    body: "{{ fad_dns_zone_txt_record_body }}"
+    body: "{{ fad_dns_zone_txt_record_request_body }}"
   register: fad_dns_zone_txt_record_post_result
   when: fad_dns_zone_txt_record_existing_data.json.payload.mkey is undefined
   changed_when: fad_dns_zone_txt_record_post_result.json.payload == 0
@@ -69,9 +69,11 @@
   register: fad_dns_zone_txt_record_post_result
   when: >
     (fad_dns_zone_txt_record_existing_data.json.payload.mkey is defined) and
-    (fad_dns_zone_txt_record_existing_data.json.payload.name != txt_record.name or
+    (
+    fad_dns_zone_txt_record_existing_data.json.payload.name != txt_record.name or
     fad_dns_zone_txt_record_existing_data.json.payload.text != txt_record.text or
-    fad_dns_zone_txt_record_existing_data.json.payload.ttl != txt_record.ttl)
+    fad_dns_zone_txt_record_existing_data.json.payload.ttl != txt_record.ttl | default('-1') | string
+    )
   changed_when: fad_dns_zone_txt_record_post_result.json.payload == 0
   failed_when: (fad_dns_zone_txt_record_post_result.json.payload != 0) and (fad_dns_zone_txt_record_post_result.json.payload != -15)
   tags:
