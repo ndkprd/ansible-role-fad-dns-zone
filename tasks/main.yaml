@@ -14,6 +14,9 @@
     - fad_dns_zone_ptr_records
     - fad_dns_zone_cname_records
     - fad_dns_zone_txt_records
+    - fad_dns_zone_mx_records
+    - fad_dns_zone_srv_records
+    - fad_dns_zone_caa_records
 
 - name: Update the zone configuration
   ansible.builtin.include_tasks: 01-0-dns-zones.yaml
@@ -27,4 +30,6 @@
     - fad_dns_zone_ptr_records
     - fad_dns_zone_cname_records
     - fad_dns_zone_txt_records
-
+    - fad_dns_zone_mx_records
+    - fad_dns_zone_srv_records
+    - fad_dns_zone_caa_records
