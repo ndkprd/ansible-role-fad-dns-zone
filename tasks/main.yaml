@@ -46,6 +46,24 @@
   ansible.builtin.import_tasks: fad_dns_zone_a_aaaa_record.yaml
   tags: [fad_dns_zone, fad_dns_zone_a_aaaa_record]
 
+# - name: Import create/update CAA Records tasks.
+  # vars:
+  #   fad_dns_zone_caa_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_caa_record }}"
+  # ansible.builtin.import_tasks: fad_dns_zone_caa_record.yaml
+  # tags: [fad_dns_zone, fad_dns_zone_caa_record]
+
+- name: Import create/update CNAME Records tasks.
+  vars:
+    fad_dns_zone_cname_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_cname_record }}"
+  ansible.builtin.import_tasks: fad_dns_zone_cname_record.yaml
+  tags: [fad_dns_zone, fad_dns_zone_cname_record]
+
+- name: Import create/update MX Records tasks.
+  vars:
+    fad_dns_zone_mx_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_mx_record }}"
+  ansible.builtin.import_tasks: fad_dns_zone_mx_record.yaml
+  tags: [fad_dns_zone, fad_dns_zone_mx_record]
+
 - name: Import create/update NS Records tasks.
   vars:
     fad_dns_zone_ns_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_ns_record }}"
@@ -58,20 +76,14 @@
   ansible.builtin.import_tasks: fad_dns_zone_ptr_record.yaml
   tags: [fad_dns_zone, fad_dns_zone_ptr_record]
 
-- name: Import create/update CNAME Records tasks.
-  vars:
-    fad_dns_zone_cname_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_cname_record }}"
-  ansible.builtin.import_tasks: fad_dns_zone_cname_record.yaml
-  tags: [fad_dns_zone, fad_dns_zone_cname_record]
+# - name: Import create/update SRV Records tasks.
+  # vars:
+  #   fad_dns_zone_mx_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_srv_record }}"
+  # ansible.builtin.import_tasks: fad_dns_zone_srv_record.yaml
+  # tags: [fad_dns_zone, fad_dns_zone_srv_record]
 
 - name: Import create/update TXT Records tasks.
   vars:
     fad_dns_zone_txt_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_txt_record }}"
   ansible.builtin.import_tasks: fad_dns_zone_txt_record.yaml
   tags: [fad_dns_zone, fad_dns_zone_txt_record]
-
-- name: Import create/update MX Records tasks.
-  vars:
-    fad_dns_zone_mx_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_mx_record }}"
-  ansible.builtin.import_tasks: fad_dns_zone_mx_record.yaml
-  tags: [fad_dns_zone, fad_dns_zone_mx_record]

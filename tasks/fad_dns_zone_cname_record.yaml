@@ -3,18 +3,6 @@
 - name: Print out the DNS Zone CNAME Record existing values.
   ansible.builtin.debug:
     msg: >
-      {{ dns_zone.0.cname_records }}
-  loop: "{{ fad_dns_zones | subelements('cname_records') }}"
-  loop_control:
-    loop_var: dns_zone
-    label: "{{ dns_zone.1.alias + '.' + dns_zone.0.name }}"
-  # tags: [debug]
-  when:
-    - dns_zone.1 is defined
-
-- name: Print out the DNS Zone CNAME Record existing values.
-  ansible.builtin.debug:
-    msg: >
       {{ (lookup('url', fad_dns_zone_cname_record_api_endpoint
       % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id), validate_certs=false, split_lines=false,
       headers=fad_api_header) | from_json).get('payload') }}
