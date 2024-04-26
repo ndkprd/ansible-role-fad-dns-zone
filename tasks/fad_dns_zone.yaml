@@ -11,7 +11,9 @@
     label: "{{ dns_zone.name }}"
   tags: [debug]
 
-# it create the automatically generated fqdn_generate_* zone by creating new root GLB Host for consistency
+# instead of creating zone manually via POST to /global_dns_server_zone, it create 
+# root GLB Host to automatically create fqdn_generate_x zones for consistency
+# and so that we can use the zone for both FQDN Generate Hosts and normal DNS entries
 - name: Create new DNS Zone entry if it's not found.
   vars: 
     fad_glb_host_api_endpoint: "{{ fad_base_url + fad_api_endpoint.glb_host }}"
@@ -113,4 +115,3 @@
     loop_var: dns_zone
     label: "{{ dns_zone.name }}"
   tags: [debug]
-
