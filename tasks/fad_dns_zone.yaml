@@ -11,10 +11,10 @@
     label: "{{ dns_zone.name }}"
   tags: [debug]
 
-# instead of creating zone manually via POST to /global_dns_server_zone, it create 
-# root GLB Host to automatically create fqdn_generate_x zones for consistency
-# and so that we can use the zone for both FQDN Generate Hosts and normal DNS entries
 - name: Create new DNS Zone entry if it's not found.
+  # instead of creating zone manually via POST to /global_dns_server_zone, it create 
+  # root GLB Host to automatically create fqdn_generate_x zones for consistency
+  # and so that we can use the zone for both FQDN Generate Hosts and normal DNS entries
   vars: 
     fad_glb_host_api_endpoint: "{{ fad_base_url + fad_api_endpoint.glb_host }}"
   ansible.builtin.uri:
@@ -94,16 +94,6 @@
     headers=fad_api_header) | from_json).get('payload').allow_transfer != dns_zone.allow_transfer)
   changed_when: "fad_dns_zone_put_results.json.payload == 0"
   failed_when: "fad_dns_zone_put_results.json.payload != 0 and fad_dns_zone_put_results.json.payload != -15"
-
-- name: Compare existing vs desired values.
-  debug:
-    msg: 
-      - Existing value: "{{ (lookup('url', fad_dns_zone_api_endpoint % ('fqdn_generate_' + dns_zone.name + '.'), validate_certs=false, split_lines=false, headers=fad_api_header) | from_json).get('payload').ttl }}"
-      - Desired value: "{{ dns_zone.ttl }}"
-  loop: "{{ fad_dns_zones }}"
-  loop_control:
-    loop_var: dns_zone
-    label: "{{ dns_zone.name }}"
 
 - name: Print out the DNS Zone values after create/update task.
   ansible.builtin.debug:
