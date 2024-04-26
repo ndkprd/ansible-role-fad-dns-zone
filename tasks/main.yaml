@@ -76,11 +76,11 @@
   ansible.builtin.import_tasks: fad_dns_zone_ptr_record.yaml
   tags: [fad_dns_zone, fad_dns_zone_ptr_record]
 
-# - name: Import create/update SRV Records tasks.
-  # vars:
-  #   fad_dns_zone_mx_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_srv_record }}"
-  # ansible.builtin.import_tasks: fad_dns_zone_srv_record.yaml
-  # tags: [fad_dns_zone, fad_dns_zone_srv_record]
+- name: Import create/update SRV Records tasks.
+  vars:
+    fad_dns_zone_srv_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_srv_record }}"
+  ansible.builtin.import_tasks: fad_dns_zone_srv_record.yaml
+  tags: [fad_dns_zone, fad_dns_zone_srv_record]
 
 - name: Import create/update TXT Records tasks.
   vars:

@@ -1,0 +1,105 @@
+---
+
+- name: Print out the DNS Zone SRV Record existing values.
+  ansible.builtin.debug:
+    msg: >
+      {{ (lookup('url', fad_dns_zone_srv_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id), validate_certs=false, split_lines=false,
+      headers=fad_api_header) | from_json).get('payload') }}
+  loop: "{{ fad_dns_zones | subelements('srv_records') }}"
+  loop_control:
+    loop_var: dns_zone
+    label: "{{ dns_zone.1.port | string + ' for ' + dns_zone.1.targetname + 'of' + dns_zone.0.name }}"
+  tags: [debug]
+
+- name: Create new DNS Zone SRV Record entry if it's not found.
+  ansible.builtin.uri:
+    method: POST
+    url: "{{ fad_dns_zone_srv_record_api_endpoint | format(('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id) }}"
+    body_format: "{{ fad_api_uri_params.body_format }}"
+    validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+    return_content: "{{ fad_api_uri_params.return_content }}"
+    status_code: "{{ fad_api_uri_params.status_code }}"
+    headers: "{{ fad_api_header }}"
+    body: |
+      {
+        "mkey": "{{ dns_zone.1.id | string }}",
+        "hostname": "{{ dns_zone.1.hostname | default('@') |string }}",
+        "port": "{{ dns_zone.1.port | string }}",
+        "priority": "{{ dns_zone.1.priority | string }}",
+        "targetname": "{{ dns_zone.1.targetname | string }}",
+        "ttl": "{{ dns_zone.1.ttl | default('-1') | string }}",
+        "weight": "{{ dns_zone.1.weight | string }}"
+      }
+  register: fad_dns_zone_srv_record_post_results
+  loop: "{{ fad_dns_zones | subelements('srv_records') }}"
+  loop_control:
+    loop_var: dns_zone
+    label: "{{ dns_zone.1.port | string + ' for ' + dns_zone.1.targetname + 'of' + dns_zone.0.name }}"
+  when:
+    - (lookup('url', fad_dns_zone_srv_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').mkey is undefined
+  changed_when: "fad_dns_zone_srv_record_post_results.json.payload == 0"
+  failed_when: "fad_dns_zone_srv_record_post_results.json.payload not in [0, -15]"
+
+- name: Update DNS Zone SRV Record entry if it's exist and any of its value is changed.
+  ansible.builtin.uri:
+    method: PUT
+    url: "{{ fad_dns_zone_srv_record_api_endpoint | format(('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id) }}"
+    body_format: "{{ fad_api_uri_params.body_format }}"
+    validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+    return_content: "{{ fad_api_uri_params.return_content }}"
+    status_code: "{{ fad_api_uri_params.status_code }}"
+    headers: "{{ fad_api_header }}"
+    body: |
+      {
+        "mkey": "{{ dns_zone.1.id | string }}",
+        "hostname": "{{ dns_zone.1.hostname | default('@') |string }}",
+        "port": "{{ dns_zone.1.port | string }}",
+        "priority": "{{ dns_zone.1.priority | string }}",
+        "targetname": "{{ dns_zone.1.targetname | string }}",
+        "ttl": "{{ dns_zone.1.ttl | default('-1') | string }}",
+        "weight": "{{ dns_zone.1.weight | string }}"
+      }
+  register: fad_dns_zone_srv_record_put_results
+  loop: "{{ fad_dns_zones | subelements('srv_records') }}"
+  loop_control:
+    loop_var: dns_zone
+    label: "{{ dns_zone.1.port | string + ' for ' + dns_zone.1.targetname + 'of' + dns_zone.0.name }}"
+  when:
+    - (lookup('url', fad_dns_zone_srv_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').mkey is defined
+    - (lookup('url', fad_dns_zone_srv_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').hostname != dns_zone.1.hostname | string or
+      (lookup('url', fad_dns_zone_srv_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').port != dns_zone.1.port | string or
+      (lookup('url', fad_dns_zone_srv_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').priority != dns_zone.1.priority | default('0') | string or
+      (lookup('url', fad_dns_zone_srv_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').targetname != dns_zone.1.targetname | string or
+      (lookup('url', fad_dns_zone_srv_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').ttl != dns_zone.1.ttl | default('-1') | string or
+      (lookup('url', fad_dns_zone_srv_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').weight != dns_zone.1.weight | default('1') | string
+  changed_when: "fad_dns_zone_srv_record_put_results.json.payload == 0"
+  failed_when: "fad_dns_zone_srv_record_put_results.json.payload not in [0, -15]"
+
+- name: Print out the DNS Zone SRV Record values after create/update task.
+  ansible.builtin.debug:
+    msg: >
+      {{ (lookup('url', fad_dns_zone_srv_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id), validate_certs=false, split_lines=false,
+      headers=fad_api_header) | from_json).get('payload') }}
+  loop: "{{ fad_dns_zones | subelements('srv_records') }}"
+  loop_control:
+    loop_var: dns_zone
+    label: "{{ dns_zone.1.port | string + ' for ' + dns_zone.1.targetname + 'of' + dns_zone.0.name }}"
+  tags: [debug]
