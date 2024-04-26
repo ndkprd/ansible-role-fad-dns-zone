@@ -1,0 +1,106 @@
+- name: Create/update DNS Zone VSP List entries.
+  vars:
+    fad_dns_zone_vsp_list_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_vsp_list }}"
+  tags: [fad_dns_zone, fad_dns_zone_vsp_lists]
+  block:
+
+    - name: Print out the DNS Zone VSP List existing values.
+      ansible.builtin.debug:
+        msg: >
+          {{ (lookup('url', fad_dns_zone_vsp_list_api_endpoint
+          % (dns_zone.0.name, dns_zone.1.name), validate_certs=false, split_lines=false,
+          headers=fad_api_header) | from_json).get('payload') }}
+      loop: "{{ fad_dns_zone | subelements('vsp_lists') }}"
+      loop_control:
+        loop_var: dns_zone
+        label: "{{ dns_zone.0.name + ' to ' + dns_zone.1.pool_name }}"
+      tags: [debug]
+
+    - name: Create new DNS Zone VSP List entry if it's not found.
+      ansible.builtin.uri:
+        method: POST
+        url: "{{ fad_dns_zone_vsp_list_api_endpoint | format(dns_zone.0.name, dns_zone.1.name) }}"
+        body_format: "{{ fad_api_uri_params.body_format }}"
+        validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+        return_content: "{{ fad_api_uri_params.return_content }}"
+        status_code: "{{ fad_api_uri_params.status_code }}"
+        headers: "{{ fad_api_header }}"
+        body: |
+          {
+            "mkey": "{{ dns_zone.1.name | string }}",
+            "isp": "{{ dns_zone.1.isp | default('') }}",
+            "topology": "{{ dns_zone.1.topology | default('') }}",
+            "virtual-server-pool": "{{ dns_zone.1.pool_name }}",
+            "weight": "{{ dns_zone.1.weight | default('100') | string }}"
+          }
+      register: fad_dns_zone_vsp_list_post_results
+      loop: "{{ fad_dns_zone | subelements('vsp_lists') }}"
+      loop_control:
+        loop_var: dns_zone
+        label: "{{ dns_zone.0.name + ' to ' + dns_zone.1.pool_name }}"
+      when: >
+        (lookup('url', fad_dns_zone_vsp_list_api_endpoint
+        % (dns_zone.0.name, dns_zone.1.name),validate_certs=false, split_lines=false,
+        headers=fad_api_header) | from_json).get('payload').mkey is undefined
+      changed_when: "fad_dns_zone_vsp_list_post_results.json.payload == 0"
+      failed_when: "fad_dns_zone_vsp_list_post_results.json.payload not in [0, -15]"
+
+    - name: Update DNS Zone VSP List entry if it's exist and any of its value is changed.
+      ansible.builtin.uri:
+        method: PUT
+        url: "{{ fad_dns_zone_vsp_list_api_endpoint | format(dns_zone.0.name, dns_zone.1.name) }}"
+        body_format: "{{ fad_api_uri_params.body_format }}"
+        validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+        return_content: "{{ fad_api_uri_params.return_content }}"
+        status_code: "{{ fad_api_uri_params.status_code }}"
+        headers: "{{ fad_api_header }}"
+        body: |
+          {
+            "mkey": "{{ dns_zone.1.name | string }}",
+            "isp": "{{ dns_zone.1.isp | default('') }}",
+            "topology": "{{ dns_zone.1.topology | default('') }}",
+            "virtual-server-pool": "{{ dns_zone.1.pool_name }}",
+            "weight": "{{ dns_zone.1.weight | default('100') | string }}"
+          }
+      register: fad_dns_zone_vsp_list_put_results
+      loop: "{{ fad_dns_zone | subelements('vsp_lists') }}"
+      loop_control:
+        loop_var: dns_zone
+        label: "{{ dns_zone.0.name + ' to ' + dns_zone.1.pool_name }}"
+      when: >
+        ((lookup('url', fad_dns_zone_vsp_list_api_endpoint
+        % (dns_zone.0.name, dns_zone.1.name),validate_certs=false, split_lines=false,
+        headers=fad_api_header) | from_json).get('payload')['mkey'] is defined) and
+        (
+        (lookup('url', fad_dns_zone_vsp_list_api_endpoint
+        % (dns_zone.0.name, dns_zone.1.name),validate_certs=false, split_lines=false,
+        headers=fad_api_header) | from_json).get('payload')['isp'] != dns_zone.1.isp | default('')  or
+        (lookup('url', fad_dns_zone_vsp_list_api_endpoint
+        % (dns_zone.0.name, dns_zone.1.name),validate_certs=false, split_lines=false,
+        headers=fad_api_header) | from_json).get('payload')['topology'] != dns_zone.1.topology | default('') or
+        (lookup('url', fad_dns_zone_vsp_list_api_endpoint
+        % (dns_zone.0.name, dns_zone.1.name),validate_certs=false, split_lines=false,
+        headers=fad_api_header) | from_json).get('payload')['virtual-server-pool'] != dns_zone.1.pool_name or
+        (lookup('url', fad_dns_zone_vsp_list_api_endpoint
+        % (dns_zone.0.name, dns_zone.1.name),validate_certs=false, split_lines=false,
+        headers=fad_api_header) | from_json).get('payload')['weight'] != dns_zone.1.weight | default ('100') | string
+        )
+      changed_when: "fad_dns_zone_vsp_list_put_results.json.payload == 0"
+      failed_when: "fad_dns_zone_vsp_list_put_results.json.payload not in [0, -15]"
+
+    - name: Print out the DNS Zone VSP List values after create/update task.
+      ansible.builtin.debug:
+        msg: >
+          {{ (lookup('url', fad_dns_zone_vsp_list_api_endpoint
+          % (dns_zone.0.name, dns_zone.1.name), validate_certs=false, split_lines=false,
+          headers=fad_api_header) | from_json).get('payload') }}
+      loop: "{{ fad_dns_zone | subelements('vsp_lists') }}"
+      loop_control:
+        loop_var: dns_zone
+        label: "{{ dns_zone.0.name + ' to ' + dns_zone.1.pool_name }}"
+      tags: [debug]
+
+- name: Update DNS Policy zone list.
+  ansible.builtin.include_role:
+    name: ndkprd.fad_dns_policy
+  tags: [fad_dns_zone]

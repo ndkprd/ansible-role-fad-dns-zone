@@ -1,35 +1,41 @@
 ---
 
-- name: Trying to create fqdn_generate zone by adding domain root record
-  block:
-    - name: Trying to create fqdn_generate zone by adding domain root record
-      ansible.builtin.include_tasks: 00-glb-host-root.yaml
-      loop: "{{ fad_dns_zones }}"
-      loop_control:
-        loop_var: dns_zone
-  tags:
-    - fad_dns_zones
-    - fad_dns_zone_a_aaaa_records
-    - fad_dns_zone_ns_records
-    - fad_dns_zone_ptr_records
-    - fad_dns_zone_cname_records
-    - fad_dns_zone_txt_records
-    - fad_dns_zone_mx_records
-    - fad_dns_zone_srv_records
-    - fad_dns_zone_caa_records
+# - name: Trying to create fqdn_generate zone by adding domain root record
+  # block:
+  #   - name: Trying to create fqdn_generate zone by adding domain root record
+  #     ansible.builtin.include_tasks: 00-glb-host-root.yaml
+  #     loop: "{{ fad_dns_zones }}"
+  #     loop_control:
+  #       loop_var: dns_zone
+  # tags:
+  #   - fad_dns_zones
+  #   - fad_dns_zone_a_aaaa_records
+  #   - fad_dns_zone_ns_records
+  #   - fad_dns_zone_ptr_records
+  #   - fad_dns_zone_cname_records
+  #   - fad_dns_zone_txt_records
+  #   - fad_dns_zone_mx_records
+  #   - fad_dns_zone_srv_records
+  #   - fad_dns_zone_caa_records
 
-- name: Update the zone configuration
-  ansible.builtin.include_tasks: 01-0-dns-zones.yaml
-  loop: "{{ fad_dns_zones }}"
-  loop_control:
-    loop_var: dns_zone
-  tags:
-    - fad_dns_zones
-    - fad_dns_zone_a_aaaa_records
-    - fad_dns_zone_ns_records
-    - fad_dns_zone_ptr_records
-    - fad_dns_zone_cname_records
-    - fad_dns_zone_txt_records
-    - fad_dns_zone_mx_records
-    - fad_dns_zone_srv_records
-    - fad_dns_zone_caa_records
+# - name: Update the zone configuration
+  # ansible.builtin.include_tasks: 01-0-dns-zones.yaml
+  # loop: "{{ fad_dns_zones }}"
+  # loop_control:
+  #   loop_var: dns_zone
+  # tags:
+  #   - fad_dns_zones
+  #   - fad_dns_zone_a_aaaa_records
+  #   - fad_dns_zone_ns_records
+  #   - fad_dns_zone_ptr_records
+  #   - fad_dns_zone_cname_records
+  #   - fad_dns_zone_txt_records
+  #   - fad_dns_zone_mx_records
+  #   - fad_dns_zone_srv_records
+  #   - fad_dns_zone_caa_records
+
+- name: Import create/update zone tasks.
+  vars:
+    fad_dns_zone_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone }}"
+  ansible.builtin.import_tasks: fad_dns_zone.yaml
+  tags: [fad_dns_zone]
