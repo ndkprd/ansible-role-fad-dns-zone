@@ -1,6 +1,4 @@
 ---
-fad_vdom: "root"
-
 fad_dns_policy:
   - name: "DEFAULT_DNS_POLICY" # Global DNS Policy mkey
     source_address: "any" # valid Address Group entry mkey used as source

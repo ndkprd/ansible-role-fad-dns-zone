@@ -1,0 +1,52 @@
+---
+
+- name: Update/create FortiADC resources.
+  hosts: all
+  become: false
+  gather_facts: false
+  connection: local
+  vars:
+     # for testing-purpose only, to delete the created resources after. change to 'false' if you want the resource to stay.
+    do_cleanup: true
+
+  roles:
+    - ../../ansible-role-fortiadc-dns-zones
+
+  # clean-up tasks if you need to delete the resources you just create.
+  tasks:
+    - name: Clean up tasks.
+      block:
+
+        - name: Clean up the created root GLB Host resources.
+          vars: 
+            fad_glb_host_api_endpoint: "{{ fad_base_url + fad_api_endpoint.glb_host }}"
+          ansible.builtin.uri:
+            method: DELETE
+            url: "{{ fad_glb_host_api_endpoint | format(dns_zone.name) }}"
+            body_format: "{{ fad_api_uri_params.body_format }}"
+            validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+            return_content: "{{ fad_api_uri_params.return_content }}"
+            status_code: "{{ fad_api_uri_params.status_code }}"
+            headers: "{{ fad_api_header }}"
+          register: fad_dns_zone_post_results
+          loop: "{{ fad_dns_zones }}"
+          loop_control:
+            loop_var: dns_zone
+            label: "{{ dns_zone.name }}"
+          when: do_cleanup
+          tags: [cleanup, fad_dns_zones]
+
+        - name: Clean up the created DNS Server zone resources.
+          ansible.builtin.uri:
+            method: DELETE
+            url: "https://{{ ansible_host }}/api/global_dns_server_zone?vdom={{ fad_vdom }}&mkey={{ item.name }}"
+            body_format: "{{ fad_api_uri_params.body_format }}"
+            validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+            return_content: "{{ fad_api_uri_params.return_content }}"
+            status_code: "{{ fad_api_uri_params.status_code }}"
+            headers: "{{ fad_api_header }}"
+          when: do_cleanup
+          loop: "{{ fad_dns_zones }}"
+          loop_control:
+            label: "{{ item.name }}"
+          tags: [cleanup, fad_dns_zones]

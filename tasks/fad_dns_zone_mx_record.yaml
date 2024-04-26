@@ -1,0 +1,112 @@
+---
+
+- name: Print out the DNS Zone MX Record existing values.
+  ansible.builtin.debug:
+    msg: >
+      {{ (lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id), validate_certs=false, split_lines=false,
+      headers=fad_api_header) | from_json).get('payload') }}
+  loop: "{{ fad_dns_zones | subelements('mx_records') }}"
+  loop_control:
+    loop_var: dns_zone
+    label: "{{ dns_zone.1.hostname + ' -> ' + dns_zone.0.name }}"
+  tags: [debug]
+
+- name: Create new DNS Zone MX Record entry if it's not found.
+  ansible.builtin.uri:
+    method: POST
+    url: "{{ fad_dns_zone_mx_record_api_endpoint | format(('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id) }}"
+    body_format: "{{ fad_api_uri_params.body_format }}"
+    validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+    return_content: "{{ fad_api_uri_params.return_content }}"
+    status_code: "{{ fad_api_uri_params.status_code }}"
+    headers: "{{ fad_api_header }}"
+    body: |
+      {
+        "mkey": "{{ dns_zone.1.id | string }}",
+        "domain_name": "{{ dns_zone.1.domain_name | default('@') | string }}",
+        "hostname": "{{ dns_zone.1.hostname | default('mail') }}",
+        "ip": "{{ dns_zone.1.ipv4 | default('0.0.0.0') | string }}",
+        "ip6": "{{ dns_zone.1.ipv6 | default('::') | string }}",
+        "priority": "{{ dns_zone.1.priority | default('10') | string }}",
+        "type": "{{ dns_zone.1.type | default('ipv4') }}",
+        "ttl": "{{ dns_zone.1.ttl | default('-1') | string }}"
+      }
+  register: fad_dns_zone_mx_record_post_results
+  loop: "{{ fad_dns_zones | subelements('mx_records') }}"
+  loop_control:
+    loop_var: dns_zone
+    label: "{{ dns_zone.1.hostname + ' -> ' + dns_zone.0.name }}"
+  when:
+    - (lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').mkey is undefined
+  changed_when: "fad_dns_zone_mx_record_post_results.json.payload == 0"
+  failed_when: "fad_dns_zone_mx_record_post_results.json.payload not in [0, -15]"
+
+- name: Update DNS Zone MX Record entry if it's exist and any of its value is changed.
+  ansible.builtin.uri:
+    method: PUT
+    url: "{{ fad_dns_zone_mx_record_api_endpoint | format(('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id) }}"
+    body_format: "{{ fad_api_uri_params.body_format }}"
+    validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+    return_content: "{{ fad_api_uri_params.return_content }}"
+    status_code: "{{ fad_api_uri_params.status_code }}"
+    headers: "{{ fad_api_header }}"
+    body: |
+      {
+        "mkey": "{{ dns_zone.1.id | string }}",
+        "domain_name": "{{ dns_zone.1.domain_name | default('@') | string }}",
+        "hostname": "{{ dns_zone.1.hostname | default('mail') }}",
+        "ip": "{{ dns_zone.1.ipv4 | default('0.0.0.0') | string }}",
+        "ip6": "{{ dns_zone.1.ipv6 | default('::') | string }}",
+        "priority": "{{ dns_zone.1.priority | default('10') | string }}",
+        "type": "{{ dns_zone.1.type | default('ipv4') }}",
+        "ttl": "{{ dns_zone.1.ttl | default('-1') | string }}"
+      }
+  register: fad_dns_zone_mx_record_put_results
+  loop: "{{ fad_dns_zones | subelements('mx_records') }}"
+  loop_control:
+    loop_var: dns_zone
+    label: "{{ dns_zone.1.hostname + ' -> ' + dns_zone.0.name }}"
+  when: >
+    ((lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').mkey is defined) and
+    (
+    (lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').domain_name != dns_zone.1.domain_name | default('@') | string or
+    (lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').hostname != dns_zone.1.hostname | default('mail') or
+    (lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').ip != dns_zone.1.ipv4 | default('0.0.0.0') | string or
+    (lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').ip6 != dns_zone.1.ipv6 | default('::') | string or
+    (lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').priority != dns_zone.1.priority | default('10') | string or
+    (lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').type != dns_zone.1.type | default('ipv4') or
+    (lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').ttl != dns_zone.1.ttl | default('-1') | string
+    )
+  changed_when: "fad_dns_zone_mx_record_put_results.json.payload == 0"
+  failed_when: "fad_dns_zone_mx_record_put_results.json.payload not in [0, -15]"
+
+- name: Print out the DNS Zone MX Record values after create/update task.
+  ansible.builtin.debug:
+    msg: >
+      {{ (lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id), validate_certs=false, split_lines=false,
+      headers=fad_api_header) | from_json).get('payload') }}
+  loop: "{{ fad_dns_zones | subelements('mx_records') }}"
+  loop_control:
+    loop_var: dns_zone
+    label: "{{ dns_zone.1.hostname + ' -> ' + dns_zone.0.name }}"
+  tags: [debug]
