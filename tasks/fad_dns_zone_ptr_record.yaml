@@ -9,7 +9,7 @@
   loop: "{{ fad_dns_zones | subelements('ptr_records') }}"
   loop_control:
     loop_var: dns_zone
-    label: "{{ dns_zone.1.hostname + ' -> ' + dns_zone.0.name }}"
+    label: "{{ dns_zone.1.ptr_address + ' -> ' + dns_zone.1.fqdn }}"
   tags: [debug]
 
 - name: Create new DNS Zone PTR Record entry if it's not found.
@@ -24,18 +24,15 @@
     body: |
       {
         "mkey": "{{ dns_zone.1.id | string }}",
-        "host_name": "{{ dns_zone.1.hostname }}",
-        "domain_name": "{{ dns_zone.1.domain_name }}",
-        "ip": "{{ dns_zone.1.ipv4 | default('0.0.0.0') | string }}",
-        "ip6": "{{ dns_zone.1.ipv6 | default('::') | string }}",
-        "ttl": "{{ dns_zone.1.ttl | default('-1') | string }}",
-        "type": "{{ dns_zone.1.ip_type | default('ipv4') | string }}"
+        "fqdn": "{{ dns_zone.1.fqdn | string }}",
+        "ptr-address": "{{ dns_zone.1.ptr_address | string }}",
+        "ttl": "{{ dns_zone.1.ttl | default('-1') | string }}"
       }
   register: fad_dns_zone_ptr_record_post_results
   loop: "{{ fad_dns_zones | subelements('ptr_records') }}"
   loop_control:
     loop_var: dns_zone
-    label: "{{ dns_zone.1.hostname + ' -> ' + dns_zone.0.name }}"
+    label: "{{ dns_zone.1.ptr_address + ' -> ' + dns_zone.1.fqdn }}"
   when:
     - (lookup('url', fad_dns_zone_ptr_record_api_endpoint
       % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
@@ -55,38 +52,28 @@
     body: |
       {
         "mkey": "{{ dns_zone.1.id | string }}",
-        "host_name": "{{ dns_zone.1.hostname }}",
-        "domain_name": "{{ dns_zone.1.domain_name | default('@') | string }}",
-        "ip": "{{ dns_zone.1.ipv4 | default('0.0.0.0') | string }}",
-        "ip6": "{{ dns_zone.1.ipv6 | default('::') | string }}",
-        "ttl": "{{ dns_zone.1.ttl | default('-1') | string }}",
-        "type": "{{ dns_zone.1.ip_type | default('ipv4') | string }}"
+        "fqdn": "{{ dns_zone.1.fqdn | string }}",
+        "ptr-address": "{{ dns_zone.1.ptr_address | string }}",
+        "ttl": "{{ dns_zone.1.ttl | default('-1') | string }}"
       }
   register: fad_dns_zone_ptr_record_put_results
   loop: "{{ fad_dns_zones | subelements('ptr_records') }}"
   loop_control:
     loop_var: dns_zone
-    label: "{{ dns_zone.1.hostname + ' -> ' + dns_zone.0.name }}"
+    label: "{{ dns_zone.1.ptr_address + ' -> ' + dns_zone.1.fqdn }}"
   when: >
-    ((lookup('url', fad_dns_zone_ptr_record_api_endpoint
+    - ((lookup('url', fad_dns_zone_ptr_record_api_endpoint
       % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
       split_lines=false, headers=fad_api_header) | from_json).get('payload').mkey is defined) and
-    ((lookup('url', fad_dns_zone_ptr_record_api_endpoint
+      ((lookup('url', fad_dns_zone_ptr_record_api_endpoint
       % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
-      split_lines=false, headers=fad_api_header) | from_json).get('payload').host_name != dns_zone.1.hostname or
-    (lookup('url', fad_dns_zone_ptr_record_api_endpoint
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').fqdn != dns_zone.1.fqdn | string or
+      (lookup('url', fad_dns_zone_ptr_record_api_endpoint
       % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
-      split_lines=false, headers=fad_api_header) | from_json).get('payload').ip != dns_zone.1.ipv4 | default('0.0.0.0') | string or
-    (lookup('url', fad_dns_zone_ptr_record_api_endpoint
+      split_lines=false, headers=fad_api_header) | from_json).get('payload')['ptr-address'] != dns_zone.1.ptr_address | string or
+      (lookup('url', fad_dns_zone_ptr_record_api_endpoint
       % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
-      split_lines=false, headers=fad_api_header) | from_json).get('payload').ip6 != dns_zone.1.ipv6 | default('::') | string or
-    (lookup('url', fad_dns_zone_ptr_record_api_endpoint
-      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
-      split_lines=false, headers=fad_api_header) | from_json).get('payload').ttl != dns_zone.1.ttl | default('-1') | string or
-    (lookup('url', fad_dns_zone_ptr_record_api_endpoint
-      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
-      split_lines=false, headers=fad_api_header) | from_json).get('payload').type != dns_zone.1.ip_type | default('ipv4') | string
-    )
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').ttl != dns_zone.1.ttl | default('-1') | string )
   changed_when: "fad_dns_zone_ptr_record_put_results.json.payload == 0"
   failed_when: "fad_dns_zone_ptr_record_put_results.json.payload not in [0, -15]"
 
@@ -99,5 +86,5 @@
   loop: "{{ fad_dns_zones | subelements('ptr_records') }}"
   loop_control:
     loop_var: dns_zone
-    label: "{{ dns_zone.1.hostname + ' -> ' + dns_zone.0.name }}"
+    label: "{{ dns_zone.1.ptr_address + ' -> ' + dns_zone.1.fqdn }}"
   tags: [debug]
