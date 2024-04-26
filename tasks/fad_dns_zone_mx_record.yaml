@@ -11,8 +11,6 @@
     loop_var: dns_zone
     label: "{{ dns_zone.1.alias + '.' + dns_zone.0.name }}"
   tags: [debug]
-  when:
-    - dns_zone.1 is defined
 
 - name: Create new DNS Zone MX Record entry if it's not found.
   ansible.builtin.uri:
@@ -26,8 +24,12 @@
     body: |
       {
         "mkey": "{{ dns_zone.1.id | string }}",
-        "alias": "{{ dns_zone.1.alias | string }}",
-        "target": "{{ dns_zone.1.target | string }}",
+        "domain_name": "{{ dns_zone.1.domain_name | default('@') | string }}",
+        "hostname": "{{ dns_zone.1.hostname | default('mail') }}",
+        "ip": "{{ dns_zone.1.ipv4 | default('0.0.0.0') | string }}",
+        "ip6": "{{ dns_zone.1.ipv6 | default('::') | string }}",
+        "priority": "{{ dns_zone.1.priority | default('10') | string }}",
+        "type": "{{ dns_zone.1.type | default('ipv4') }}",
         "ttl": "{{ dns_zone.1.ttl | default('-1') | string }}"
       }
   register: fad_dns_zone_mx_record_post_results
@@ -36,7 +38,6 @@
     loop_var: dns_zone
     label: "{{ dns_zone.1.alias + '.' + dns_zone.0.name }}"
   when:
-    - dns_zone.0.mx_records is defined
     - (lookup('url', fad_dns_zone_mx_record_api_endpoint
       % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
       split_lines=false, headers=fad_api_header) | from_json).get('payload').mkey is undefined
@@ -55,8 +56,12 @@
     body: |
       {
         "mkey": "{{ dns_zone.1.id | string }}",
-        "alias": "{{ dns_zone.1.alias | string }}",
-        "target": "{{ dns_zone.1.target | string }}",
+        "domain_name": "{{ dns_zone.1.domain_name | default('@') | string }}",
+        "hostname": "{{ dns_zone.1.hostname | default('mail') }}",
+        "ip": "{{ dns_zone.1.ipv4 | default('0.0.0.0') | string }}",
+        "ip6": "{{ dns_zone.1.ipv6 | default('::') | string }}",
+        "priority": "{{ dns_zone.1.priority | default('10') | string }}",
+        "type": "{{ dns_zone.1.type | default('ipv4') }}",
         "ttl": "{{ dns_zone.1.ttl | default('-1') | string }}"
       }
   register: fad_dns_zone_mx_record_put_results
@@ -71,10 +76,22 @@
     (
     (lookup('url', fad_dns_zone_mx_record_api_endpoint
       % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
-      split_lines=false, headers=fad_api_header) | from_json).get('payload').alias != dns_zone.1.alias or
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').domain_name != dns_zone.1.domain_name | default('@') | string or
     (lookup('url', fad_dns_zone_mx_record_api_endpoint
       % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
-      split_lines=false, headers=fad_api_header) | from_json).get('payload').target != dns_zone.1.target or
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').hostname != dns_zone.1.hostname | default('mail') or
+    (lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').ip != dns_zone.1.ipv4 | default('0.0.0.0') | string or
+    (lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').ip6 != dns_zone.1.ipv6 | default('::') | string or
+    (lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').priority != dns_zone.1.priority | default('10') | string or
+    (lookup('url', fad_dns_zone_mx_record_api_endpoint
+      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      split_lines=false, headers=fad_api_header) | from_json).get('payload').type != dns_zone.1.type | default('ipv4') or
     (lookup('url', fad_dns_zone_mx_record_api_endpoint
       % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
       split_lines=false, headers=fad_api_header) | from_json).get('payload').ttl != dns_zone.1.ttl | default('-1') | string
@@ -93,5 +110,3 @@
     loop_var: dns_zone
     label: "{{ dns_zone.1.alias + '.' + dns_zone.0.name }}"
   tags: [debug]
-  when:
-    - dns_zone.0.mx_records is defined
