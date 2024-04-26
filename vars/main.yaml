@@ -7,10 +7,12 @@ fad_api_endpoint:
   dns_policy: "/global_dns_server_policy?vdom={{ fad_vdom }}&mkey=%s"
   dns_zone: "/global_dns_server_zone?vdom={{ fad_vdom }}&mkey=%s"
   dns_zone_a_aaaa_record: "/global_dns_server_zone_child_a_aaaa_record?vdom={{ fad_vdom }}&pkey=%s&mkey=%s"
+  dns_zone_caa_record: "/global_dns_server_zone_child_caa_record?vdom={{ fad_vdom }}&pkey=%s&mkey=%s"
   dns_zone_cname_record: "/global_dns_server_zone_child_cname_record?vdom={{ fad_vdom }}&pkey=%s&mkey=%s"
   dns_zone_mx_record: "/global_dns_server_zone_child_mx_record?vdom={{ fad_vdom }}&pkey=%s&mkey=%s"
   dns_zone_ns_record: "/global_dns_server_zone_child_ns_record?vdom={{ fad_vdom }}&pkey=%s&mkey=%s"
   dns_zone_ptr_record: "/global_dns_server_zone_child_ptr_record?vdom={{ fad_vdom }}&pkey=%s&mkey=%s"
+  dns_zone_srv_record: "/global_dns_server_zone_child_srv_record?vdom={{ fad_vdom }}&pkey=%s&mkey=%s"
   dns_zone_txt_record: "/global_dns_server_zone_child_txt_record?vdom={{ fad_vdom }}&pkey=%s&mkey=%s"
 
 fad_api_uri_params:

@@ -46,11 +46,11 @@
   ansible.builtin.import_tasks: fad_dns_zone_a_aaaa_record.yaml
   tags: [fad_dns_zone, fad_dns_zone_a_aaaa_record]
 
-# - name: Import create/update CAA Records tasks.
-  # vars:
-  #   fad_dns_zone_caa_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_caa_record }}"
-  # ansible.builtin.import_tasks: fad_dns_zone_caa_record.yaml
-  # tags: [fad_dns_zone, fad_dns_zone_caa_record]
+- name: Import create/update CAA Records tasks.
+  vars:
+    fad_dns_zone_caa_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_caa_record }}"
+  ansible.builtin.import_tasks: fad_dns_zone_caa_record.yaml
+  tags: [fad_dns_zone, fad_dns_zone_caa_record]
 
 - name: Import create/update CNAME Records tasks.
   vars:
