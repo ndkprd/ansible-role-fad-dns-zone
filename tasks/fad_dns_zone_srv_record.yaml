@@ -9,7 +9,7 @@
   loop: "{{ fad_dns_zones | subelements('srv_records') }}"
   loop_control:
     loop_var: dns_zone
-    label: "{{'Port ' dns_zone.1.port | string + ' for ' + dns_zone.1.targetname + ' of ' + dns_zone.0.name }}"
+    label: "{{'Port ' + dns_zone.1.port | string + ' for ' + dns_zone.1.targetname + ' of ' + dns_zone.0.name }}"
   tags: [debug]
 
 - name: Create new DNS Zone SRV Record entry if it's not found.
@@ -35,7 +35,7 @@
   loop: "{{ fad_dns_zones | subelements('srv_records') }}"
   loop_control:
     loop_var: dns_zone
-    label: "{{'Port ' dns_zone.1.port | string + ' for ' + dns_zone.1.targetname + ' of ' + dns_zone.0.name }}"
+    label: "{{'Port ' + dns_zone.1.port | string + ' for ' + dns_zone.1.targetname + ' of ' + dns_zone.0.name }}"
   when:
     - (lookup('url', fad_dns_zone_srv_record_api_endpoint
       % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
@@ -66,7 +66,7 @@
   loop: "{{ fad_dns_zones | subelements('srv_records') }}"
   loop_control:
     loop_var: dns_zone
-    label: "{{'Port ' dns_zone.1.port | string + ' for ' + dns_zone.1.targetname + ' of ' + dns_zone.0.name }}"
+    label: "{{'Port ' + dns_zone.1.port | string + ' for ' + dns_zone.1.targetname + ' of ' + dns_zone.0.name }}"
   when:
     - (lookup('url', fad_dns_zone_srv_record_api_endpoint
       % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
@@ -101,5 +101,5 @@
   loop: "{{ fad_dns_zones | subelements('srv_records') }}"
   loop_control:
     loop_var: dns_zone
-    label: "{{'Port ' dns_zone.1.port | string + ' for ' + dns_zone.1.targetname + ' of ' + dns_zone.0.name }}"
+    label: "{{'Port ' + dns_zone.1.port | string + ' for ' + dns_zone.1.targetname + ' of ' + dns_zone.0.name }}"
   tags: [debug]

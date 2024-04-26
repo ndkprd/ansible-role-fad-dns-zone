@@ -8,6 +8,10 @@
   vars:
      # for testing-purpose only, to delete the created resources after. change to 'false' if you want the resource to stay.
     do_cleanup: true
+    async_mode:
+      enabled: true
+      timeout: 30
+      poll_duration: 0
 
   roles:
     - ../../ansible-role-fortiadc-dns-zones

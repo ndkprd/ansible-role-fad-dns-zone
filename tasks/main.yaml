@@ -1,89 +1,84 @@
 ---
 
-# - name: Trying to create fqdn_generate zone by adding domain root record
-  # block:
-  #   - name: Trying to create fqdn_generate zone by adding domain root record
-  #     ansible.builtin.include_tasks: 00-glb-host-root.yaml
-  #     loop: "{{ fad_dns_zones }}"
-  #     loop_control:
-  #       loop_var: dns_zone
-  # tags:
-  #   - fad_dns_zones
-  #   - fad_dns_zone_a_aaaa_records
-  #   - fad_dns_zone_ns_records
-  #   - fad_dns_zone_ptr_records
-  #   - fad_dns_zone_cname_records
-  #   - fad_dns_zone_txt_records
-  #   - fad_dns_zone_mx_records
-  #   - fad_dns_zone_srv_records
-  #   - fad_dns_zone_caa_records
-
-# - name: Update the zone configuration
-  # ansible.builtin.include_tasks: 01-0-dns-zones.yaml
-  # loop: "{{ fad_dns_zones }}"
-  # loop_control:
-  #   loop_var: dns_zone
-  # tags:
-  #   - fad_dns_zones
-  #   - fad_dns_zone_a_aaaa_records
-  #   - fad_dns_zone_ns_records
-  #   - fad_dns_zone_ptr_records
-  #   - fad_dns_zone_cname_records
-  #   - fad_dns_zone_txt_records
-  #   - fad_dns_zone_mx_records
-  #   - fad_dns_zone_srv_records
-  #   - fad_dns_zone_caa_records
+- name: Set async value if async mode is enabled.
+  ansible.builtin.set_fact:
+    async_timeout: "{{ async_mode.timeout }}"
+    async_poll_duration: "{{ async_mode.poll_duration }}"
+  when: async_mode.enabled
 
 - name: Import create/update zone tasks.
   vars:
     fad_dns_zone_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone }}"
   ansible.builtin.import_tasks: fad_dns_zone.yaml
   tags: [fad_dns_zone]
+  async: "{{ async_timeout | default(omit) }}"
+  poll: "{{ async_poll_duration | default(omit) }}"
 
 - name: Import create/update A and AAAA Records tasks.
   vars:
     fad_dns_zone_a_aaaa_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_a_aaaa_record }}"
   ansible.builtin.import_tasks: fad_dns_zone_a_aaaa_record.yaml
   tags: [fad_dns_zone, fad_dns_zone_a_aaaa_record]
+  async: "{{ async_timeout | default(omit) }}"
+  poll: "{{ async_poll_duration | default(omit) }}"
 
 - name: Import create/update CAA Records tasks.
   vars:
     fad_dns_zone_caa_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_caa_record }}"
   ansible.builtin.import_tasks: fad_dns_zone_caa_record.yaml
   tags: [fad_dns_zone, fad_dns_zone_caa_record]
+  async: "{{ async_timeout | default(omit) }}"
+  poll: "{{ async_poll_duration | default(omit) }}"
 
 - name: Import create/update CNAME Records tasks.
   vars:
     fad_dns_zone_cname_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_cname_record }}"
   ansible.builtin.import_tasks: fad_dns_zone_cname_record.yaml
   tags: [fad_dns_zone, fad_dns_zone_cname_record]
+  async: "{{ async_timeout | default(omit) }}"
+  poll: "{{ async_poll_duration | default(omit) }}"
 
 - name: Import create/update MX Records tasks.
   vars:
     fad_dns_zone_mx_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_mx_record }}"
   ansible.builtin.import_tasks: fad_dns_zone_mx_record.yaml
   tags: [fad_dns_zone, fad_dns_zone_mx_record]
+  async: "{{ async_timeout | default(omit) }}"
+  poll: "{{ async_poll_duration | default(omit) }}"
 
 - name: Import create/update NS Records tasks.
   vars:
     fad_dns_zone_ns_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_ns_record }}"
   ansible.builtin.import_tasks: fad_dns_zone_ns_record.yaml
   tags: [fad_dns_zone, fad_dns_zone_ns_record]
+  async: "{{ async_timeout | default(omit) }}"
+  poll: "{{ async_poll_duration | default(omit) }}"
 
 - name: Import create/update PTR Records tasks.
   vars:
     fad_dns_zone_ptr_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_ptr_record }}"
   ansible.builtin.import_tasks: fad_dns_zone_ptr_record.yaml
   tags: [fad_dns_zone, fad_dns_zone_ptr_record]
+  async: "{{ async_timeout | default(omit) }}"
+  poll: "{{ async_poll_duration | default(omit) }}"
 
 - name: Import create/update SRV Records tasks.
   vars:
     fad_dns_zone_srv_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_srv_record }}"
   ansible.builtin.import_tasks: fad_dns_zone_srv_record.yaml
   tags: [fad_dns_zone, fad_dns_zone_srv_record]
+  async: "{{ async_timeout | default(omit) }}"
+  poll: "{{ async_poll_duration | default(omit) }}"
 
 - name: Import create/update TXT Records tasks.
   vars:
     fad_dns_zone_txt_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_txt_record }}"
   ansible.builtin.import_tasks: fad_dns_zone_txt_record.yaml
   tags: [fad_dns_zone, fad_dns_zone_txt_record]
+  async: "{{ async_timeout | default(omit) }}"
+  poll: "{{ async_poll_duration | default(omit) }}"
+
+- name: Update DNS Policy zone list.
+  ansible.builtin.include_role:
+    name: ndkprd.fad_dns_policy
+  tags: [fad_dns_zone]

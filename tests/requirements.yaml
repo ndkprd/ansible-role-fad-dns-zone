@@ -1,0 +1,5 @@
+---
+
+roles:
+  - ndkprd.fad_dns_zone
+  - ndkprd.fad_dns_policy

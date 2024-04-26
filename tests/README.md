@@ -1,6 +1,6 @@
 # Run Playbook
 
 ```bash
-ansible-galaxy install ndkprd.fad_glb_dns_zone
+ansible-galaxy install -r requirements.yaml
 ansible-playbook -i hosts test.yaml
 ```
