@@ -36,7 +36,7 @@
           when: do_cleanup
           tags: [cleanup, fad_dns_zones]
 
-        - name: Clean up the created VS Pools resources.
+        - name: Clean up the created DNS Server zone resources.
           ansible.builtin.uri:
             method: DELETE
             url: "https://{{ ansible_host }}/api/global_dns_server_zone?vdom={{ fad_vdom }}&mkey={{ item.name }}"
