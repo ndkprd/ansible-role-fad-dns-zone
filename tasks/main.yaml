@@ -16,7 +16,6 @@
     - fad_dns_zone_srv_record
     - fad_dns_zone_txt_record
 
-
 - name: Import create/update A and AAAA Records tasks.
   vars:
     fad_dns_zone_a_aaaa_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_a_aaaa_record }}"

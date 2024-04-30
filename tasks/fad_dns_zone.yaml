@@ -4,22 +4,50 @@
   ansible.builtin.debug:
     msg: >
       {{ (lookup('url', fad_dns_zone_api_endpoint
-      % ('fqdn_generate_' + dns_zone.name + '.'), validate_certs=false, split_lines=false, headers=fad_api_header) | from_json).get('payload') }}
+      % (dns_zone.name), validate_certs=false, split_lines=false, headers=fad_api_header) | from_json).get('payload') }}
   loop: "{{ fad_dns_zones }}"
   loop_control:
     loop_var: dns_zone
     label: "{{ dns_zone.name }}"
   tags: [debug]
 
-- name: Create new DNS Zone entry if it's not found.
-  # instead of creating zone manually via POST to /global_dns_server_zone, it create 
-  # root GLB Host to automatically create fqdn_generate_x zones for consistency
-  # and so that we can use the zone for both FQDN Generate Hosts and normal DNS entries
-  vars: 
-    fad_glb_host_api_endpoint: "{{ fad_base_url + fad_api_endpoint.glb_host }}"
+# - name: Create new DNS Zone entry if it's not found.
+  # # instead of creating zone manually via POST to /global_dns_server_zone, it create 
+  # # root GLB Host to automatically create fqdn_generate_x zones for consistency
+  # # and so that we can use the zone for both FQDN Generate Hosts and normal DNS entries
+  # vars: 
+  #   fad_glb_host_api_endpoint: "{{ fad_base_url + fad_api_endpoint.glb_host }}"
+  # ansible.builtin.uri:
+  #   method: POST
+  #   url: "{{ fad_glb_host_api_endpoint | format(dns_zone.name) }}"
+  #   body_format: "{{ fad_api_uri_params.body_format }}"
+  #   validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+  #   return_content: "{{ fad_api_uri_params.return_content }}"
+  #   status_code: "{{ fad_api_uri_params.status_code }}"
+  #   headers: "{{ fad_api_header }}"
+  #   body: |
+  #     {
+  #       "mkey": "{{ dns_zone.name }}",
+  #       "host-name": "@",
+  #       "domain-name": "{{ dns_zone.name }}."
+  #     }
+  # register: fad_dns_zone_post_results
+  # loop: "{{ fad_dns_zones }}"
+  # loop_control:
+  #   loop_var: dns_zone
+  #   label: "{{ dns_zone.name }}"
+  # when:
+  #   - dns_zone.create_fqdn_zone_enabled
+  #   - (lookup('url', fad_glb_host_api_endpoint
+  #     % (dns_zone.name), validate_certs=false, split_lines=false,
+  #     headers=fad_api_header) | from_json).get('payload').mkey is undefined
+  # changed_when: "fad_dns_zone_post_results.json.payload == 0"
+  # failed_when: fad_dns_zone_post_results.json.payload not in [0, -15]
+
+- name: Create DNS Zone entry if it's exist and any of its value is changed.
   ansible.builtin.uri:
     method: POST
-    url: "{{ fad_glb_host_api_endpoint | format(dns_zone.name) }}"
+    url: "{{ fad_dns_zone_api_endpoint | format(dns_zone.name) }}"
     body_format: "{{ fad_api_uri_params.body_format }}"
     validate_certs: "{{ fad_api_uri_params.validate_certs }}"
     return_content: "{{ fad_api_uri_params.return_content }}"
@@ -28,25 +56,33 @@
     body: |
       {
         "mkey": "{{ dns_zone.name }}",
-        "host-name": "@",
-        "domain-name": "{{ dns_zone.name }}."
+        "domain_name": "{{ dns_zone.domain_name }}",
+        "type": "{{ dns_zone.type }}",
+        "ttl": "{{ dns_zone.ttl | default('3600') }}",
+        "negative_ttl": "{{ dns_zone.negative_ttl | default('3600') }}",
+        "primary_server_ip": "{{ dns_zone.primary_ns_ipv4 }}",
+        "primary_server_ip6": "{{ dns_zone.primary_ns_ipv6 }}",
+        "primary_server_name": "{{ dns_zone.primary_ns_name | default('ns') }}",
+        "responible_mail": "{{ dns_zone.responsible_mail | default('admin') }}",
+        "allow_transfer": "{{ dns_zone.allow_transfer | default('') }}",
+        "serial": "{{ '%Y%m%d%H' | strftime }}"
       }
-  register: fad_dns_zone_post_results
+  register: fad_dns_zone_put_results
   loop: "{{ fad_dns_zones }}"
   loop_control:
     loop_var: dns_zone
     label: "{{ dns_zone.name }}"
-  when: >
-    (lookup('url', fad_glb_host_api_endpoint
-    % (dns_zone.name), validate_certs=false, split_lines=false,
-    headers=fad_api_header) | from_json).get('payload').mkey is undefined
-  changed_when: "fad_dns_zone_post_results.json.payload == 0"
-  failed_when: fad_dns_zone_post_results.json.payload not in [0, -15]
+  when:
+    - (lookup('url', fad_dns_zone_api_endpoint
+      % (dns_zone.name), validate_certs=false, split_lines=false,
+      headers=fad_api_header) | from_json).get('payload').mkey is undefined
+  changed_when: "fad_dns_zone_put_results.json.payload == 0"
+  failed_when: "fad_dns_zone_put_results.json.payload != 0 and fad_dns_zone_put_results.json.payload != -15"
 
 - name: Update DNS Zone entry if it's exist and any of its value is changed.
   ansible.builtin.uri:
     method: PUT
-    url: "{{ fad_dns_zone_api_endpoint | format('fqdn_generate_' + dns_zone.name + '.') }}"
+    url: "{{ fad_dns_zone_api_endpoint | format(dns_zone.name) }}"
     body_format: "{{ fad_api_uri_params.body_format }}"
     validate_certs: "{{ fad_api_uri_params.validate_certs }}"
     return_content: "{{ fad_api_uri_params.return_content }}"
@@ -54,13 +90,17 @@
     headers: "{{ fad_api_header }}"
     body: |
       {
+        "domain_name": "{{ dns_zone.domain_name }}",
         "ttl": "{{ dns_zone.ttl | default('3600') }}",
+        "type": "{{ dns_zone.type }}",
+        "dns_policy": "{{ dns_zone.dns_policy }}"
         "negative_ttl": "{{ dns_zone.negative_ttl | default('3600') }}",
         "primary_server_ip": "{{ dns_zone.primary_ns_ipv4 }}",
         "primary_server_ip6": "{{ dns_zone.primary_ns_ipv6 }}",
         "primary_server_name": "{{ dns_zone.primary_ns_name | default('ns') }}",
         "responible_mail": "{{ dns_zone.responsible_mail | default('admin') }}",
-        "allow_transfer": "{{ dns_zone.allow_transfer | default('') }}"
+        "allow_transfer": "{{ dns_zone.allow_transfer | default('') }}",
+        "serial": "{{ '%Y%m%d%H' | strftime }}"
       }
   register: fad_dns_zone_put_results
   loop: "{{ fad_dns_zones }}"
@@ -69,28 +109,28 @@
     label: "{{ dns_zone.name }}"
   when: >
     ((lookup('url', fad_dns_zone_api_endpoint
-    % ('fqdn_generate_' + dns_zone.name + '.'), validate_certs=false, split_lines=false,
+    % (dns_zone.name), validate_certs=false, split_lines=false,
     headers=fad_api_header) | from_json).get('payload').mkey is defined) and
     ((lookup('url', fad_dns_zone_api_endpoint
-    % ('fqdn_generate_' + dns_zone.name + '.'), validate_certs=false, split_lines=false,
+    % (dns_zone.name), validate_certs=false, split_lines=false,
     headers=fad_api_header) | from_json).get('payload').ttl != dns_zone.ttl or
     (lookup('url', fad_dns_zone_api_endpoint
-    % ('fqdn_generate_' + dns_zone.name + '.'), validate_certs=false, split_lines=false,
+    % (dns_zone.name), validate_certs=false, split_lines=false,
     headers=fad_api_header) | from_json).get('payload').negative_ttl != dns_zone.negative_ttl or
     (lookup('url', fad_dns_zone_api_endpoint
-    % ('fqdn_generate_' + dns_zone.name + '.'), validate_certs=false, split_lines=false,
+    % (dns_zone.name), validate_certs=false, split_lines=false,
     headers=fad_api_header) | from_json).get('payload').primary_server_ip != dns_zone.primary_ns_ipv4 or
     (lookup('url', fad_dns_zone_api_endpoint
-    % ('fqdn_generate_' + dns_zone.name + '.'), validate_certs=false, split_lines=false,
+    % (dns_zone.name), validate_certs=false, split_lines=false,
     headers=fad_api_header) | from_json).get('payload').primary_server_ip6 != dns_zone.primary_ns_ipv6 or
     (lookup('url', fad_dns_zone_api_endpoint
-    % ('fqdn_generate_' + dns_zone.name + '.'), validate_certs=false, split_lines=false,
+    % (dns_zone.name), validate_certs=false, split_lines=false,
     headers=fad_api_header) | from_json).get('payload').primary_server_name != dns_zone.primary_ns_name or
     (lookup('url', fad_dns_zone_api_endpoint
-    % ('fqdn_generate_' + dns_zone.name + '.'), validate_certs=false, split_lines=false,
+    % (dns_zone.name), validate_certs=false, split_lines=false,
     headers=fad_api_header) | from_json).get('payload').responible_mail != dns_zone.responsible_mail or 
     (lookup('url', fad_dns_zone_api_endpoint
-    % ('fqdn_generate_' + dns_zone.name + '.'), validate_certs=false, split_lines=false,
+    % (dns_zone.name), validate_certs=false, split_lines=false,
     headers=fad_api_header) | from_json).get('payload').allow_transfer != dns_zone.allow_transfer)
   changed_when: "fad_dns_zone_put_results.json.payload == 0"
   failed_when: "fad_dns_zone_put_results.json.payload != 0 and fad_dns_zone_put_results.json.payload != -15"
@@ -99,7 +139,7 @@
   ansible.builtin.debug:
     msg: >
       {{ (lookup('url', fad_dns_zone_api_endpoint
-      % ('fqdn_generate_' + dns_zone.name + '.'), validate_certs=false, split_lines=false, headers=fad_api_header) | from_json).get('payload') }}
+      % (dns_zone.name), validate_certs=false, split_lines=false, headers=fad_api_header) | from_json).get('payload') }}
   loop: "{{ fad_dns_zones }}"
   loop_control:
     loop_var: dns_zone
