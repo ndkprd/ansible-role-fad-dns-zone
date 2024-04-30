@@ -54,13 +54,13 @@
     headers: "{{ fad_api_header }}"
     body: |
       {
-        "ttl": "{{ dns_zone.ttl }}",
-        "negative_ttl": "{{ dns_zone.negative_ttl }}",
+        "ttl": "{{ dns_zone.ttl | default('3600') }}",
+        "negative_ttl": "{{ dns_zone.negative_ttl | default('3600') }}",
         "primary_server_ip": "{{ dns_zone.primary_ns_ipv4 }}",
         "primary_server_ip6": "{{ dns_zone.primary_ns_ipv6 }}",
-        "primary_server_name": "{{ dns_zone.primary_ns_name }}",
-        "responible_mail": "{{ dns_zone.responsible_mail }}",
-        "allow_transfer": "{{ dns_zone.allow_transfer }}"
+        "primary_server_name": "{{ dns_zone.primary_ns_name | default('ns') }}",
+        "responible_mail": "{{ dns_zone.responsible_mail | default('admin') }}",
+        "allow_transfer": "{{ dns_zone.allow_transfer | default('') }}"
       }
   register: fad_dns_zone_put_results
   loop: "{{ fad_dns_zones }}"
