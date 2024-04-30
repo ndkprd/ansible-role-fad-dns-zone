@@ -11,39 +11,6 @@
     label: "{{ dns_zone.name }}"
   tags: [debug]
 
-# - name: Create new DNS Zone entry if it's not found.
-  # # instead of creating zone manually via POST to /global_dns_server_zone, it create 
-  # # root GLB Host to automatically create fqdn_generate_x zones for consistency
-  # # and so that we can use the zone for both FQDN Generate Hosts and normal DNS entries
-  # vars: 
-  #   fad_glb_host_api_endpoint: "{{ fad_base_url + fad_api_endpoint.glb_host }}"
-  # ansible.builtin.uri:
-  #   method: POST
-  #   url: "{{ fad_glb_host_api_endpoint | format(dns_zone.name) }}"
-  #   body_format: "{{ fad_api_uri_params.body_format }}"
-  #   validate_certs: "{{ fad_api_uri_params.validate_certs }}"
-  #   return_content: "{{ fad_api_uri_params.return_content }}"
-  #   status_code: "{{ fad_api_uri_params.status_code }}"
-  #   headers: "{{ fad_api_header }}"
-  #   body: |
-  #     {
-  #       "mkey": "{{ dns_zone.name }}",
-  #       "host-name": "@",
-  #       "domain-name": "{{ dns_zone.name }}."
-  #     }
-  # register: fad_dns_zone_post_results
-  # loop: "{{ fad_dns_zones }}"
-  # loop_control:
-  #   loop_var: dns_zone
-  #   label: "{{ dns_zone.name }}"
-  # when:
-  #   - dns_zone.create_fqdn_zone_enabled
-  #   - (lookup('url', fad_glb_host_api_endpoint
-  #     % (dns_zone.name), validate_certs=false, split_lines=false,
-  #     headers=fad_api_header) | from_json).get('payload').mkey is undefined
-  # changed_when: "fad_dns_zone_post_results.json.payload == 0"
-  # failed_when: fad_dns_zone_post_results.json.payload not in [0, -15]
-
 - name: Create DNS Zone entry if it's exist and any of its value is changed.
   ansible.builtin.uri:
     method: POST
@@ -58,6 +25,7 @@
         "mkey": "{{ dns_zone.name }}",
         "domain_name": "{{ dns_zone.domain_name }}",
         "type": "{{ dns_zone.type }}",
+        "dns_policy": "{{ dns_zone.dns_policy }}",
         "ttl": "{{ dns_zone.ttl | default('3600') }}",
         "negative_ttl": "{{ dns_zone.negative_ttl | default('3600') }}",
         "primary_server_ip": "{{ dns_zone.primary_ns_ipv4 }}",
@@ -91,9 +59,9 @@
     body: |
       {
         "domain_name": "{{ dns_zone.domain_name }}",
+        "dns_policy": "{{ dns_zone.dns_policy }}",
         "ttl": "{{ dns_zone.ttl | default('3600') }}",
         "type": "{{ dns_zone.type }}",
-        "dns_policy": "{{ dns_zone.dns_policy }}"
         "negative_ttl": "{{ dns_zone.negative_ttl | default('3600') }}",
         "primary_server_ip": "{{ dns_zone.primary_ns_ipv4 }}",
         "primary_server_ip6": "{{ dns_zone.primary_ns_ipv6 }}",
@@ -145,3 +113,8 @@
     loop_var: dns_zone
     label: "{{ dns_zone.name }}"
   tags: [debug]
+
+- name: Update DNS Policy zone list.
+  vars:
+    fad_dns_policy_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_policy }}"
+  ansible.builtin.import_tasks: fad_dns_policy_zone_list_update.yaml
