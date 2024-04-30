@@ -4,7 +4,7 @@
   ansible.builtin.debug:
     msg: >
       {{ (lookup('url', fad_dns_zone_cname_record_api_endpoint
-      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id), validate_certs=false, split_lines=false,
+      % ((dns_zone.0.name), dns_zone.1.id), validate_certs=false, split_lines=false,
       headers=fad_api_header) | from_json).get('payload') }}
   loop: "{{ fad_dns_zones | subelements('cname_records') }}"
   loop_control:
@@ -17,7 +17,7 @@
 - name: Create new DNS Zone CNAME Record entry if it's not found.
   ansible.builtin.uri:
     method: POST
-    url: "{{ fad_dns_zone_cname_record_api_endpoint | format(('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id) }}"
+    url: "{{ fad_dns_zone_cname_record_api_endpoint | format((dns_zone.0.name), dns_zone.1.id) }}"
     body_format: "{{ fad_api_uri_params.body_format }}"
     validate_certs: "{{ fad_api_uri_params.validate_certs }}"
     return_content: "{{ fad_api_uri_params.return_content }}"
@@ -38,7 +38,7 @@
   when:
     - dns_zone.0.cname_records is defined
     - (lookup('url', fad_dns_zone_cname_record_api_endpoint
-      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      % ((dns_zone.0.name), dns_zone.1.id),validate_certs=false,
       split_lines=false, headers=fad_api_header) | from_json).get('payload').mkey is undefined
   changed_when: "fad_dns_zone_cname_record_post_results.json.payload == 0"
   failed_when: "fad_dns_zone_cname_record_post_results.json.payload not in [0, -15]"
@@ -46,7 +46,7 @@
 - name: Update DNS Zone CNAME Record entry if it's exist and any of its value is changed.
   ansible.builtin.uri:
     method: PUT
-    url: "{{ fad_dns_zone_cname_record_api_endpoint | format(('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id) }}"
+    url: "{{ fad_dns_zone_cname_record_api_endpoint | format((dns_zone.0.name), dns_zone.1.id) }}"
     body_format: "{{ fad_api_uri_params.body_format }}"
     validate_certs: "{{ fad_api_uri_params.validate_certs }}"
     return_content: "{{ fad_api_uri_params.return_content }}"
@@ -66,17 +66,17 @@
     label: "{{ dns_zone.1.alias + '.' + dns_zone.0.name }}"
   when: >
     ((lookup('url', fad_dns_zone_cname_record_api_endpoint
-      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      % ((dns_zone.0.name), dns_zone.1.id),validate_certs=false,
       split_lines=false, headers=fad_api_header) | from_json).get('payload').mkey is defined) and
     (
     (lookup('url', fad_dns_zone_cname_record_api_endpoint
-      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      % ((dns_zone.0.name), dns_zone.1.id),validate_certs=false,
       split_lines=false, headers=fad_api_header) | from_json).get('payload').alias != dns_zone.1.alias or
     (lookup('url', fad_dns_zone_cname_record_api_endpoint
-      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      % ((dns_zone.0.name), dns_zone.1.id),validate_certs=false,
       split_lines=false, headers=fad_api_header) | from_json).get('payload').target != dns_zone.1.target or
     (lookup('url', fad_dns_zone_cname_record_api_endpoint
-      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id),validate_certs=false,
+      % ((dns_zone.0.name), dns_zone.1.id),validate_certs=false,
       split_lines=false, headers=fad_api_header) | from_json).get('payload').ttl != dns_zone.1.ttl | default('-1') | string
     )
   changed_when: "fad_dns_zone_cname_record_put_results.json.payload == 0"
@@ -86,7 +86,7 @@
   ansible.builtin.debug:
     msg: >
       {{ (lookup('url', fad_dns_zone_cname_record_api_endpoint
-      % (('fqdn_generate_' + dns_zone.0.name + '.'), dns_zone.1.id), validate_certs=false, split_lines=false,
+      % ((dns_zone.0.name), dns_zone.1.id), validate_certs=false, split_lines=false,
       headers=fad_api_header) | from_json).get('payload') }}
   loop: "{{ fad_dns_zones | subelements('cname_records') }}"
   loop_control:

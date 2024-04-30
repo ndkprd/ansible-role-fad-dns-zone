@@ -6,16 +6,16 @@ An Ansible role to create/update Global DNS Zones and their DNS entries on Forti
 
 ## Roadmap
 
-- [x] create/update root GLB Hosts for domain to automatically create fqdn_generate zones (I did this since you can't change Primary Zones to FQDN Generate Zones, and you can't use GLB Hosts on existing Primary Zones)
+- [x] create/update zones
 - [x] move the zones into DNS Policy 
 - [x] create/update A/AAAA Records
 - [x] create/update NS Records
 - [x] create/update PTR Records
 - [x] create/update CNAME Records
 - [x] create/update TXT records
-- [ ] create/update CAA records
+- [x] create/update CAA records
 - [x] create/update MX records
-- [ ] crate/update SRV records
+- [x] crate/update SRV records
 
 (yeah, this shouldn't be version 1.0.0, I messed up)
 
@@ -23,30 +23,8 @@ An Ansible role to create/update Global DNS Zones and their DNS entries on Forti
 
 ### Install Role
 
-#### From Galaxy
-
 ```
-ansible-galaxy install ndkprd.fortiadc-dns-policy
-```
-
-#### From Github
-
-##### Create Requirements File
-
-```
----
-# ./requirements.yaml
-
-- name: ndkprd.fortiadc-dns-zones
-  scm: git
-  src: https://github.com/ndkprd/ansible-role-fortiadc-dns-zones.git
-  version: main # or 'devel' or release/tag name
-```
-
-##### Install
-
-```
-ansible-galaxy install -r requirements.yaml
+ansible-galaxy install ndkprd.fad_dns_zone
 ```
 
 ### Playbook Example
@@ -116,7 +94,7 @@ I added quiet lots of debug task, mainly to check if the variable I set is corre
 
 For example, if you're using CLI, you can just go `ansible-playbook playbook.yaml --skip-tags debug`.
 
-Since this roles cover all the DNS type, if you only want to run on certain entry type only, you can use the following tags:
+Since this roles cover all the DNS type, if you only want to run on certain records type only (or skip some of them), you can use the following tags:
 
 - fad_dns_zone_a_aaaa_records
 - fad_dns_zone_ns_records

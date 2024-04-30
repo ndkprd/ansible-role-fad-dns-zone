@@ -14,7 +14,7 @@
       poll_duration: 0
 
   roles:
-    - ../../ansible-role-fortiadc-dns-zones
+    - ../..
 
   # clean-up tasks if you need to delete the resources you just create.
   tasks:

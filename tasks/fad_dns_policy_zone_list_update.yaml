@@ -1,0 +1,25 @@
+---
+
+- name: Update DNS Policy zone list.
+  ansible.builtin.uri:
+    method: PUT
+    url: "{{ fad_dns_policy_api_endpoint | format(dns_zone.dns_policy) }}"
+    body_format: "{{ fad_api_uri_params.body_format }}"
+    validate_certs: "{{ fad_api_uri_params.validate_certs }}"
+    return_content: "{{ fad_api_uri_params.return_content }}"
+    status_code: "{{ fad_api_uri_params.status_code }}"
+    headers: "{{ fad_api_header }}"
+    body: |
+      {
+        "zone_list": "{{ (lookup('url', fad_dns_policy_api_endpoint
+          % (dns_zone.dns_policy), validate_certs=false, split_lines=false,
+          headers=fad_api_header) | from_json).get('payload')['zone_list']
+          + dns_zone.name + ' '}}"
+      }
+  register: fad_dns_policy_put_results
+  loop: "{{ fad_dns_zones }}"
+  loop_control:
+    loop_var: dns_zone
+    label: "{{ dns_zone.name + ' to ' + dns_zone.dns_policy }}"
+  changed_when: "fad_dns_policy_put_results.json.payload == 0"
+  failed_when: "fad_dns_policy_put_results.json.payload != 0 and fad_dns_policy_put_results.json.payload != -15"
