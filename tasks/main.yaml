@@ -16,6 +16,21 @@
     - fad_dns_zone_srv_record
     - fad_dns_zone_txt_record
 
+- name: Update DNS Policy zone list.
+  vars:
+    fad_dns_policy_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_policy }}"
+  ansible.builtin.import_tasks: fad_dns_policy_zone_list_update.yaml
+  tags:
+    - fad_dns_zone
+    - fad_dns_zone_a_aaaa_record
+    - fad_dns_zone_caa_record
+    - fad_dns_zone_cname_record
+    - fad_dns_zone_mx_record
+    - fad_dns_zone_ns_record
+    - fad_dns_zone_ptr_record
+    - fad_dns_zone_srv_record
+    - fad_dns_zone_txt_record
+
 - name: Import create/update A and AAAA Records tasks.
   vars:
     fad_dns_zone_a_aaaa_record_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_zone_a_aaaa_record }}"

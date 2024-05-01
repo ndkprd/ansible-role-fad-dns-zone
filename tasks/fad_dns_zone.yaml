@@ -11,7 +11,7 @@
     label: "{{ dns_zone.name }}"
   tags: [debug]
 
-- name: Create DNS Zone entry if it's exist and any of its value is changed.
+- name: Create DNS Zone entry if it's not exist.
   ansible.builtin.uri:
     method: POST
     url: "{{ fad_dns_zone_api_endpoint | format(dns_zone.name) }}"
@@ -23,7 +23,7 @@
     body: |
       {
         "mkey": "{{ dns_zone.name }}",
-        "domain_name": "{{ dns_zone.domain_name }}",
+        "domain_name": "{{ dns_zone.domain_name }}.",
         "type": "{{ dns_zone.type }}",
         "dns_policy": "{{ dns_zone.dns_policy }}",
         "ttl": "{{ dns_zone.ttl | default('3600') }}",
@@ -58,7 +58,7 @@
     headers: "{{ fad_api_header }}"
     body: |
       {
-        "domain_name": "{{ dns_zone.domain_name }}",
+        "domain_name": "{{ dns_zone.domain_name }}.",
         "dns_policy": "{{ dns_zone.dns_policy }}",
         "ttl": "{{ dns_zone.ttl | default('3600') }}",
         "type": "{{ dns_zone.type }}",
@@ -113,8 +113,3 @@
     loop_var: dns_zone
     label: "{{ dns_zone.name }}"
   tags: [debug]
-
-- name: Update DNS Policy zone list.
-  vars:
-    fad_dns_policy_api_endpoint: "{{ fad_base_url + fad_api_endpoint.dns_policy }}"
-  ansible.builtin.import_tasks: fad_dns_policy_zone_list_update.yaml
