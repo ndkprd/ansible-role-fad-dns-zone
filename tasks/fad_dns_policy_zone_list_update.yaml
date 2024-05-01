@@ -1,5 +1,17 @@
 ---
 
+- name: Print out the current zone_list.
+  ansible.builtin.debug:
+    msg: >
+      {{ (lookup('url', fad_dns_policy_api_endpoint
+      % (dns_zone.dns_policy), validate_certs=false, split_lines=false,
+      headers=fad_api_header) | from_json).get('payload')['zone_list'] }}
+  loop: "{{ fad_dns_zones }}"
+  loop_control:
+    loop_var: dns_zone
+    label: "{{ dns_zone.name + ' to ' + dns_zone.dns_policy }}"
+  tags: [debug]
+
 - name: Update DNS Policy zone list.
   ansible.builtin.uri:
     method: PUT
@@ -23,3 +35,15 @@
     label: "{{ dns_zone.name + ' to ' + dns_zone.dns_policy }}"
   changed_when: "fad_dns_policy_put_results.json.payload == 0"
   failed_when: "fad_dns_policy_put_results.json.payload != 0 and fad_dns_policy_put_results.json.payload != -15"
+
+- name: Print out the current zone_list.
+  ansible.builtin.debug:
+    msg: >
+      {{ (lookup('url', fad_dns_policy_api_endpoint
+      % (dns_zone.dns_policy), validate_certs=false, split_lines=false,
+      headers=fad_api_header) | from_json).get('payload')['zone_list'] }}
+  loop: "{{ fad_dns_zones }}"
+  loop_control:
+    loop_var: dns_zone
+    label: "{{ dns_zone.name + ' to ' + dns_zone.dns_policy }}"
+  tags: [debug]
