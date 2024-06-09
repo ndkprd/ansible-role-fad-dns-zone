@@ -9,7 +9,7 @@
   loop: "{{ fad_dns_zones | subelements('txt_records') }}"
   loop_control:
     loop_var: dns_zone
-    label: "{{ dns_zone.1.name + '.' + dns_zone.0.domain_name + ' -> ' + dns_zone.1.text }}"
+    label: "{{ dns_zone.1.name + '.' + dns_zone.0.domain_name + ' -> ' + dns_zone.1.text  + ' of ' + dns_zone.0.name }}"
   tags: [debug]
 
 - name: Create new DNS Zone TXT Record entry if it's not found.
@@ -32,7 +32,7 @@
   loop: "{{ fad_dns_zones | subelements('txt_records') }}"
   loop_control:
     loop_var: dns_zone
-    label: "{{ dns_zone.1.name + '.' + dns_zone.0.domain_name + ' -> ' + dns_zone.1.text }}"
+    label: "{{ dns_zone.1.name + '.' + dns_zone.0.domain_name + ' -> ' + dns_zone.1.text + ' of ' + dns_zone.0.name }}"
   when:
     - (lookup('url', fad_dns_zone_txt_record_api_endpoint
       % ((dns_zone.0.name), dns_zone.1.id),validate_certs=false,
@@ -60,7 +60,7 @@
   loop: "{{ fad_dns_zones | subelements('txt_records') }}"
   loop_control:
     loop_var: dns_zone
-    label: "{{ dns_zone.1.name + '.' + dns_zone.0.domain_name + ' -> ' + dns_zone.1.text }}"
+    label: "{{ dns_zone.1.name + '.' + dns_zone.0.domain_name + ' -> ' + dns_zone.1.text + ' of ' + dns_zone.0.name }}"
   when:
     - (lookup('url', fad_dns_zone_txt_record_api_endpoint
       % ((dns_zone.0.name), dns_zone.1.id),validate_certs=false,
@@ -86,5 +86,5 @@
   loop: "{{ fad_dns_zones | subelements('txt_records') }}"
   loop_control:
     loop_var: dns_zone
-    label: "{{ dns_zone.1.name + '.' + dns_zone.0.domain_name + ' -> ' + dns_zone.1.text }}"
+    label: "{{ dns_zone.1.name + '.' + dns_zone.0.domain_name + ' -> ' + dns_zone.1.text + ' of ' + dns_zone.0.name }}"
   tags: [debug]
