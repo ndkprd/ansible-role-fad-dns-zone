@@ -24,7 +24,7 @@
       {
         "mkey": "{{ dns_zone.name }}",
         "domain_name": "{{ dns_zone.domain_name }}.",
-        "type": "{{ dns_zone.type }}",
+        "type": "{{ dns_zone.type | default('primary') }}",
         "dns_policy": "{{ dns_zone.dns_policy }}",
         "ttl": "{{ dns_zone.ttl | default('3600') }}",
         "negative_ttl": "{{ dns_zone.negative_ttl | default('3600') }}",
@@ -61,7 +61,7 @@
         "domain_name": "{{ dns_zone.domain_name }}.",
         "dns_policy": "{{ dns_zone.dns_policy }}",
         "ttl": "{{ dns_zone.ttl | default('3600') }}",
-        "type": "{{ dns_zone.type }}",
+        "type": "{{ dns_zone.type | default('primary') }}",
         "negative_ttl": "{{ dns_zone.negative_ttl | default('3600') }}",
         "primary_server_ip": "{{ dns_zone.primary_ns_ipv4 }}",
         "primary_server_ip6": "{{ dns_zone.primary_ns_ipv6 }}",
